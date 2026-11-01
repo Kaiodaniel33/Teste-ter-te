@@ -1,0 +1,2630 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="PhoneticFace: Ferramenta tecnológica de apoio docente no processo de alfabetização fônica de jovens e adultos (EJA).">
+    <meta name="theme-color" content="#0056B3">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230056B3'/%3E%3Ctext x='50' y='68' font-size='56' font-family='system-ui,sans-serif' font-weight='900' fill='white' text-anchor='middle'%3EPf%3C/text%3E%3C/svg%3E">
+    <title>PhoneticFace — Ferramenta Tecnológica de Apoio Docente</title>
+
+    <style>
+        /* ==========================================================================
+           PHONETICFACE — FOLHA DE ESTILOS UNIFICADA (CSS + HTML + JS)
+           ========================================================================== */
+        :root {
+            --cor-bg-principal: #F4F7F6;
+            --cor-bg-secundario: #FFFFFF;
+            --cor-texto-principal: #1E293B;
+            --cor-texto-secundario: #475569;
+            --cor-primaria: #0056B3;
+            --cor-primaria-escura: #003D82;
+            --cor-secundaria: #008B9E;
+            --cor-destaque: #D32F2F;
+            --cor-sucesso: #2E7D32;
+            --cor-sucesso-escuro: #1B5E20;
+            --cor-alerta: #F59E0B;
+            --cor-roxo: #5B21B6;
+            --fonte-principal: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --borda-raio: 20px;
+            --sombra-padrao: 0 8px 24px rgba(15, 23, 42, 0.06);
+            --sombra-botao: 0 5px 0px rgba(0, 0, 0, 0.18);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 100%; scroll-behavior: smooth; }
+        body {
+            font-family: var(--fonte-principal);
+            background: linear-gradient(135deg, #F4F7F6 0%, #E2E8F0 100%);
+            color: var(--cor-texto-principal);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            text-transform: none;
+        }
+
+        h1, h2, h3, .btn-letra, .btn-grande, .btn-tab, .btn-acao, .btn-instrucao,
+        .dica-inicial-box, .palavra-jogo-titulo, .slot-silaba, .bloco,
+        .barra-status-tracado, #input-nome {
+            text-transform: uppercase;
+        }
+
+        button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 4px solid var(--cor-alerta);
+            outline-offset: 2px;
+        }
+
+        .apenas-impressao { display: none; }
+
+        /* ALTO CONTRASTE */
+        body.alto-contraste { background: #000000 !important; color: #FFFF00 !important; }
+        body.alto-contraste .cabecalho-app,
+        body.alto-contraste .cartao,
+        body.alto-contraste .rodape-app,
+        body.alto-contraste .modal-caixa,
+        body.alto-contraste .menu-principal,
+        body.alto-contraste .card-interativo,
+        body.alto-contraste .card-docente,
+        body.alto-contraste .card-escolha-perfil,
+        body.alto-contraste .card-metrica,
+        body.alto-contraste .painel-desenho,
+        body.alto-contraste .ferramentas-canvas,
+        body.alto-contraste .box-tracejado,
+        body.alto-contraste .ficha-item,
+        body.alto-contraste .coluna-seletor,
+        body.alto-contraste .banner-cookies {
+            background: #000000 !important;
+            color: #FFFF00 !important;
+            border: 3px solid #FFFF00 !important;
+            box-shadow: none !important;
+        }
+        body.alto-contraste h1, body.alto-contraste h2, body.alto-contraste h3,
+        body.alto-contraste h4, body.alto-contraste p, body.alto-contraste span,
+        body.alto-contraste div, body.alto-contraste td, body.alto-contraste th,
+        body.alto-contraste li, body.alto-contraste label {
+            color: #FFFF00 !important;
+            text-shadow: none !important;
+        }
+        body.alto-contraste button,
+        body.alto-contraste input,
+        body.alto-contraste select,
+        body.alto-contraste .bloco,
+        body.alto-contraste .slot-silaba {
+            background: #000000 !important;
+            color: #FFFF00 !important;
+            border: 2px solid #FFFF00 !important;
+            box-shadow: none !important;
+        }
+        body.alto-contraste .btn-tab.active,
+        body.alto-contraste .btn-filtro.active,
+        body.alto-contraste .btn-modo-topo.ativo {
+            background: #FFFF00 !important;
+            color: #000000 !important;
+        }
+        body.alto-contraste .btn-tab.active *,
+        body.alto-contraste .btn-filtro.active * {
+            color: #000000 !important;
+        }
+        body.alto-contraste #guia-fundo { color: rgba(255, 255, 0, 0.28) !important; }
+
+        /* BARRA SUPERIOR */
+        .barra-acessibilidade {
+            background: #0F172A;
+            color: #FFF;
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .perfil-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .btn-modo-topo {
+            background: rgba(255,255,255,0.1);
+            color: #FFF;
+            border: 2px solid rgba(255,255,255,0.28);
+            padding: 7px 16px;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .btn-modo-topo.ativo { background: var(--cor-sucesso); border-color: var(--cor-sucesso); }
+        .btn-modo-topo.prof.ativo { background: var(--cor-roxo); border-color: var(--cor-roxo); }
+        .btn-trocar-perfil {
+            background: var(--cor-alerta);
+            color: #000;
+            border: none;
+            padding: 7px 16px;
+            font-weight: 900;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .controles-acesso { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .btn-acesso {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.35);
+            color: #FFF;
+            padding: 6px 14px;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .btn-acesso:hover { background: #FFF; color: #0F172A; }
+
+        header.cabecalho-app {
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+            color: #FFF;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 6px solid var(--cor-sucesso);
+            box-shadow: 0 8px 20px rgba(0, 86, 179, 0.18);
+        }
+        .logo-container { display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; margin-bottom: 0.8rem; }
+        .logo-img { max-height: 84px; border-radius: 14px; background: #FFF; padding: 5px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .cabecalho-app h1 { font-size: 3.1rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
+        .subtitulo-topo { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; opacity: 0.96; }
+        .tag-boas-vindas { margin-top: 6px; color: var(--cor-alerta); font-size: 1.1rem; font-weight: 900; display: none; }
+
+        /* NAVEGAÇÃO DE MÓDULOS */
+        .menu-toggle {
+            display: none;
+            background: #FFF;
+            color: var(--cor-primaria);
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 15px auto 0;
+        }
+        nav.menu-principal { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 1.6rem auto 0; max-width: 1400px; }
+        .btn-tab {
+            background: rgba(255,255,255,0.16);
+            color: #FFF;
+            border: 2px solid rgba(255,255,255,0.32);
+            padding: 9px 16px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-tab:hover { background: rgba(255,255,255,0.28); }
+        .btn-tab.active {
+            background: var(--cor-sucesso);
+            color: #FFF;
+            border-color: var(--cor-sucesso);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+        }
+        .btn-tab.tab-equipe { background: var(--cor-roxo); border-color: var(--cor-roxo); }
+
+        /* CONTEÚDO E MÓDULOS */
+        main.conteudo-app { flex: 1; width: 100%; max-width: 1300px; margin: 2rem auto; padding: 0 15px; }
+        .aba-conteudo { display: none; }
+        .aba-conteudo.active { display: block; }
+        .bloco-instrucao { margin-bottom: 1.6rem; }
+        .btn-instrucao {
+            width: 100%;
+            background: linear-gradient(90deg, #FFD60A 0%, #FF9F0A 100%);
+            color: #000;
+            border: none;
+            padding: 16px 20px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #C77D00;
+        }
+        .btn-instrucao:active { transform: translateY(4px); box-shadow: none; }
+
+        .cartao {
+            background: var(--cor-bg-secundario);
+            border-radius: var(--borda-raio);
+            padding: 2.2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--sombra-padrao);
+            border: 1px solid #E2E8F0;
+        }
+        .titulo-centro { text-align: center; color: var(--cor-primaria); font-size: 1.9rem; margin-bottom: 1rem; font-weight: 900; }
+        .box-tracejado { border: 3px dashed var(--cor-secundaria); padding: 22px; border-radius: 16px; background: #F8FAFC; }
+        .divisor-tracejado { margin: 28px 0; border: none; border-top: 2px dashed #CBD5E1; }
+        .flex-center { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; }
+
+        .topo-jogo-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .tag-etapa { background: #E2E8F0; color: #1E293B; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; }
+        .btn-sortear { background: var(--cor-primaria); color: #FFF; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; }
+
+        .grid-alfabeto { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 14px; }
+        .grid-numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 12px; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+
+        .btn-letra {
+            background: var(--cor-primaria);
+            color: #FFF;
+            font-size: 3rem;
+            font-weight: 900;
+            border: none;
+            border-radius: 14px;
+            height: 112px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--cor-primaria-escura);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s;
+        }
+        .btn-letra:active { transform: translateY(5px); box-shadow: none; }
+        .sub-fonema { font-size: 0.8rem; background: rgba(0,0,0,0.22); padding: 2px 8px; border-radius: 6px; margin-top: 4px; text-transform: lowercase; }
+
+        .btn-grande { font-size: 2rem; font-weight: 900; padding: 14px 28px; border-radius: 14px; border: none; cursor: pointer; color: #FFF; box-shadow: var(--sombra-botao); }
+        .btn-grande:active { transform: translateY(4px); box-shadow: none; }
+        .btn-acao { background: var(--cor-destaque); color: #FFF; border: none; padding: 16px 32px; font-size: 1.3rem; font-weight: 900; border-radius: 14px; cursor: pointer; width: 100%; box-shadow: 0 6px 0 #991B1B; }
+        .btn-ouvir-aux { background: #F1F5F9; color: #0F172A; border: 2px solid #94A3B8; padding: 10px 22px; font-size: 1rem; font-weight: 800; border-radius: 10px; cursor: pointer; }
+
+        .dica-categoria-palavra { font-size: 1.05rem; font-weight: 800; color: var(--cor-secundaria); margin-bottom: 6px; text-transform: uppercase; }
+        .dica-inicial-box { font-size: 3.1rem; color: var(--cor-primaria); letter-spacing: 8px; margin-top: 10px; background: #F8FAFC; padding: 14px 28px; border-radius: 14px; display: inline-block; border: 2px solid #CBD5E1; }
+        .icone-inicial-gigante { font-size: 2.2rem; font-weight: 900; color: var(--cor-texto-secundario); margin: 12px 0; }
+        .palavra-jogo-titulo { font-size: 3.4rem; color: var(--cor-primaria); letter-spacing: 4px; margin-bottom: 10px; }
+
+        /* MICROFONE DE RECONHECIMENTO DE FALA */
+        .btn-microfone {
+            background: #7C3AED; color: #FFF; border: none; padding: 10px 22px; font-size: 1rem;
+            font-weight: 900; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 0 #4C1D95;
+        }
+        .btn-microfone.ouvindo { background: #DC2626; animation: pulsarMic 1.2s infinite; }
+        @keyframes pulsarMic { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .status-mic-feedback { font-size: 0.9rem; font-weight: 800; color: #64748B; margin-top: 8px; text-transform: uppercase; }
+
+        /* CONSTRUTOR DE SÍLABAS */
+        .construtor-silaba-wrapper {
+            display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px;
+            padding: 20px; background: #F8FAFC; border-radius: 18px; border: 2px solid #E2E8F0;
+        }
+        .coluna-seletor {
+            display: flex; flex-direction: column; align-items: center; background: #FFFFFF; padding: 14px;
+            border-radius: 16px; border: 2px solid #CBD5E1; min-width: 145px; user-select: none; touch-action: none; cursor: ns-resize;
+        }
+        .btn-seta-roleta { width: 100%; background: #E2E8F0; color: #0F172A; border: none; padding: 8px; font-weight: 900; font-size: 0.82rem; border-radius: 8px; cursor: pointer; }
+        .btn-seta-roleta:hover { background: var(--cor-primaria); color: #FFF; }
+        .visor-roleta { font-size: 4.2rem; font-weight: 900; color: var(--cor-primaria); margin: 10px 0; line-height: 1; }
+        .visor-roleta.vogal { color: var(--cor-destaque); }
+        .legenda-roleta { font-size: 0.78rem; font-weight: 800; color: var(--cor-texto-secundario); margin-top: 8px; }
+        .sinal-operacao { font-size: 2.8rem; font-weight: 900; color: var(--cor-texto-secundario); }
+        .painel-resultado-silaba {
+            background: var(--cor-sucesso); color: #FFF; border: none; border-radius: 18px; padding: 20px 32px;
+            min-width: 250px; cursor: pointer; box-shadow: 0 7px 0 var(--cor-sucesso-escuro);
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+        }
+        .silaba-formada-grande { font-size: 4rem; font-weight: 900; line-height: 1; }
+        .palavra-exemplo-silaba { font-size: 1.25rem; font-weight: 800; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 8px; }
+        .instrucao-toque-silaba { font-size: 0.78rem; font-weight: 700; opacity: 0.9; margin-top: 4px; }
+        .btn-letra-misturada {
+            font-size: 1.7rem; font-weight: 900; padding: 12px 20px; border-radius: 12px;
+            border: 2px solid #CBD5E1; background: #FFF; color: var(--cor-texto-principal); cursor: pointer; transition: 0.15s;
+        }
+        .btn-letra-misturada:hover { border-color: var(--cor-primaria); transform: translateY(-2px); }
+        .btn-letra-misturada.vogal-mista { border-color: var(--cor-destaque); color: var(--cor-destaque); }
+
+        .area-silabas { display: flex; flex-direction: column; gap: 20px; }
+        .linha-silaba { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 18px; font-size: 2.2rem; font-weight: 900; }
+        .bloco { background: var(--cor-primaria); color: #FFF; padding: 16px 26px; border-radius: 14px; }
+        .bloco-resultado { background: var(--cor-sucesso); cursor: pointer; display: flex; align-items: center; gap: 12px; border: none; color: #FFF; font-size: 2rem; font-weight: 900; padding: 16px 26px; border-radius: 14px; box-shadow: 0 6px 0 var(--cor-sucesso-escuro); }
+
+        .card-interativo {
+            text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #FFF; border-radius: 16px; padding: 1.8rem 1.4rem; box-shadow: var(--sombra-padrao);
+            border: 2px solid #E2E8F0; transition: transform 0.2s, border-color 0.2s;
+        }
+        .card-interativo:hover { transform: translateY(-4px); border-color: var(--cor-primaria); }
+        .selo-categoria-card {
+            background: #EFF6FF; color: var(--cor-primaria); font-weight: 900; font-size: 0.75rem;
+            padding: 5px 12px; border-radius: 6px; margin-bottom: 12px; text-transform: uppercase;
+        }
+        .slot-silaba { min-width: 90px; height: 84px; padding: 0 12px; border: 3px dashed #94A3B8; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 2.1rem; font-weight: 900; background: #F8FAFC; }
+
+        /* CALIGRAFIA */
+        .barra-status-tracado { text-align: center; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; margin-bottom: 14px; background: #EFF6FF; color: var(--cor-primaria-escura); border: 2px solid #BFDBFE; }
+        .barra-status-tracado.erro { background: #FEF2F2; color: #DC2626; border-color: #FECACA; }
+        .barra-status-tracado.sucesso { background: #F0FDF4; color: #16A34A; border-color: #BBF7D0; }
+        .painel-desenho { position: relative; width: 100%; height: 420px; border: 4px dashed var(--cor-primaria); border-radius: 18px; background: #FFF; touch-action: none; overflow: hidden; }
+        #guia-fundo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 240px; font-family: Arial, Helvetica, sans-serif; color: rgba(0,0,0,0.08); user-select: none; pointer-events: none; font-weight: 900; line-height: 1; }
+        #canvas-caligrafia { position: absolute; top: 0; left: 0; cursor: crosshair; }
+        .ferramentas-canvas { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.2rem; justify-content: center; padding: 14px; border: 1px solid #E2E8F0; border-radius: 14px; background: #F8FAFC; }
+        .btn-ferramenta { padding: 10px 15px; font-size: 1.1rem; font-weight: 900; border: none; border-radius: 8px; cursor: pointer; color: #FFF; background: var(--cor-primaria); }
+        .btn-ferramenta.letra-ativa { background: var(--cor-sucesso); transform: scale(1.08); }
+        .input-gigante { width: 100%; max-width: 600px; padding: 18px; font-size: 2.1rem; text-align: center; border: 3px solid var(--cor-primaria); border-radius: 14px; font-weight: 900; background: #F8FAFC; }
+
+        .card-docente { background: #F8FAFC; padding: 20px; border-radius: 18px; box-shadow: var(--sombra-padrao); max-width: 260px; width: 100%; border: 1px solid #E2E8F0; }
+        .card-docente img { width: 100%; height: 250px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+
+        /* PAINEL DO PROFESSOR */
+        .painel-professor-topo { border-top: 6px solid var(--cor-primaria); }
+        .cabecalho-painel-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .tag-institucional { background: #EFF6FF; color: var(--cor-primaria-escura); padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; display: inline-block; text-transform: uppercase; }
+        .botoes-topo-prof { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-primario-prof { background: var(--cor-primaria); color: #FFF; border: none; padding: 11px 18px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; }
+        .btn-secundario-prof { background: #0F172A; color: #FFF; border: none; padding: 11px 18px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; }
+
+        .form-cadastro-aluno { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .input-padrao { padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.92rem; font-family: inherit; flex: 1; min-width: 170px; }
+
+        .grid-metricas { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 22px; }
+        .card-metrica { background: #F8FAFC; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #E2E8F0; border-bottom: 4px solid var(--cor-primaria); }
+        .card-metrica h3 { font-size: 2.1rem; color: var(--cor-primaria); margin-bottom: 4px; }
+        .card-metrica p { font-size: 0.82rem; font-weight: 800; color: var(--cor-texto-secundario); }
+        .card-metrica.sucesso { border-bottom-color: var(--cor-sucesso); } .card-metrica.sucesso h3 { color: var(--cor-sucesso); }
+        .card-metrica.alerta { border-bottom-color: var(--cor-destaque); } .card-metrica.alerta h3 { color: var(--cor-destaque); }
+        .card-metrica.roxo { border-bottom-color: var(--cor-roxo); } .card-metrica.roxo h3 { color: var(--cor-roxo); }
+
+        .filtros-prof { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-filtro { background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; }
+        .btn-filtro.active { background: var(--cor-primaria); color: #FFF; border-color: var(--cor-primaria); }
+
+        .tabela-container { overflow-x: auto; border-radius: 10px; border: 1px solid #E2E8F0; }
+        .tabela-professor { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        .tabela-professor th { background: #0F172A; color: #FFF; padding: 13px 14px; font-size: 0.78rem; text-transform: uppercase; }
+        .tabela-professor td { padding: 13px 14px; border-bottom: 1px solid #E2E8F0; font-weight: 600; vertical-align: middle; }
+        .barra-progresso-bg { width: 100%; background: #E2E8F0; height: 15px; border-radius: 6px; overflow: hidden; }
+        .barra-progresso-fill { height: 100%; color: #FFF; font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; }
+        .fill-verde { background: var(--cor-sucesso); } .fill-amarelo { background: #D97706; } .fill-vermelho { background: var(--cor-destaque); }
+
+        .acoes-linha-prof { display: flex; gap: 6px; flex-wrap: wrap; }
+        .btn-ver-ficha { background: #EFF6FF; color: var(--cor-primaria-escura); border: 1px solid #93C5FD; padding: 7px 11px; border-radius: 6px; font-weight: 800; font-size: 0.76rem; cursor: pointer; }
+        .btn-imprimir-linha { background: #F1F5F9; color: #0F172A; border: 1px solid #CBD5E1; padding: 7px 11px; border-radius: 6px; font-weight: 800; font-size: 0.76rem; cursor: pointer; }
+        .btn-imprimir-linha:hover { background: #0F172A; color: #FFF; }
+
+        .ficha-detalhes-box { display: flex; flex-direction: column; gap: 12px; }
+        .ficha-item { background: #F8FAFC; padding: 14px; border-radius: 12px; border-left: 5px solid var(--cor-primaria); }
+        .ficha-item h4 { font-size: 0.82rem; color: var(--cor-texto-secundario); text-transform: uppercase; margin-bottom: 4px; }
+
+        /* BANNER DE COOKIES (LGPD) E MODAIS */
+        .banner-cookies {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: #0F172A; color: #F8FAFC;
+            padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px; z-index: 99990; border-top: 3px solid var(--cor-primaria);
+            box-shadow: 0 -8px 25px rgba(0,0,0,0.25);
+        }
+        .banner-cookies-texto { font-size: 0.9rem; max-width: 880px; line-height: 1.4; }
+        .banner-cookies-botoes { display: flex; gap: 10px; }
+        .btn-cookie-aceitar { background: var(--cor-sucesso); color: #FFF; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 0.85rem; }
+        .btn-cookie-recusar { background: transparent; color: #CBD5E1; border: 1px solid #64748B; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9);
+            display: none; justify-content: center; align-items: center; z-index: 99999; padding: 15px; backdrop-filter: blur(4px);
+        }
+        .modal-overlay.visivel { display: flex !important; }
+        .modal-caixa { background: #FFF; width: 95%; max-width: 650px; border-radius: 20px; padding: 2rem; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 92vh; overflow-y: auto; }
+        .modal-entrada { max-width: 820px; }
+        .grid-entrada-perfis { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 20px; }
+        .card-escolha-perfil { background: #F8FAFC; border: 2px solid #E2E8F0; border-radius: 16px; padding: 26px 20px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
+        .selo-perfil { padding: 6px 16px; border-radius: 6px; font-weight: 900; font-size: 0.85rem; color: #FFF; margin-bottom: 12px; letter-spacing: 1px; }
+        .selo-perfil.azul { background: var(--cor-primaria); }
+        .selo-perfil.roxo { background: var(--cor-roxo); }
+        .card-escolha-perfil h3 { font-size: 1.5rem; margin-bottom: 8px; }
+        .card-escolha-perfil p { font-size: 0.94rem; color: var(--cor-texto-secundario); font-weight: 600; margin-bottom: 20px; }
+        .btn-entrar-sistema { width: 100%; border: none; padding: 15px; border-radius: 10px; font-size: 1rem; font-weight: 900; color: #FFF; cursor: pointer; }
+        .btn-entrar-sistema.azul { background: var(--cor-primaria); }
+        .btn-entrar-sistema.roxo { background: var(--cor-roxo); }
+
+        .video-wrapper { width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 14px; overflow: hidden; margin: 12px 0; }
+        .video-wrapper iframe { width: 100%; height: 100%; border: none; }
+        #letra-display { font-size: 3rem; color: var(--cor-primaria); line-height: 1; }
+        .modal-info-palavra { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 12px 0; }
+        #modal-texto-palavra { font-size: 2rem; font-weight: 900; color: var(--cor-texto-principal); }
+        .link-reserva-video { display: inline-block; font-weight: 800; color: var(--cor-primaria); text-decoration: underline; font-size: 0.92rem; }
+
+        .confete { position: fixed; width: 12px; height: 12px; z-index: 100000; animation: cair 2.8s linear forwards; border-radius: 2px; pointer-events: none; }
+        @keyframes cair { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+        .rodape-app { background: #0F172A; color: #E2E8F0; padding: 3rem 20px; margin-top: auto; border-top: 6px solid var(--cor-sucesso); }
+        .container-creditos { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; }
+        .coluna-creditos h3 { color: var(--cor-alerta); border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 8px; margin-bottom: 12px; font-size: 1rem; }
+        .coluna-creditos p { margin-bottom: 6px; font-size: 0.92rem; }
+        .rodape-legal { text-align: center; margin-top: 35px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.15); font-size: 0.8rem; color: #94A3B8; }
+
+        /* IMPRESSÃO OFICIAL (1 ALUNO EM CADA FOLHA) */
+        @media print {
+            .nao-imprimir { display: none !important; }
+            body { background: #FFFFFF !important; color: #000000 !important; }
+            .apenas-impressao { display: block !important; width: 100%; }
+            .folha-relatorio-aluno {
+                page-break-after: always;
+                break-after: page;
+                padding: 25px;
+                border: 2px solid #000;
+                margin-bottom: 20px;
+                font-family: Arial, Helvetica, sans-serif;
+                color: #000;
+            }
+            .folha-relatorio-aluno:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+            .cabecalho-folha-impressao { border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 18px; }
+            .grade-dados-impressao { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border: 1px solid #000; padding: 12px; margin-bottom: 18px; }
+            .secao-folha-impressao { border: 1px solid #000; padding: 12px; margin-bottom: 14px; }
+            .assinaturas-impressao { display: flex; justify-content: space-between; margin-top: 50px; padding-top: 10px; }
+            .linha-assinatura { width: 44%; border-top: 1px solid #000; text-align: center; padding-top: 6px; font-size: 0.85rem; }
+        }
+
+        @media (max-width: 1024px) {
+            .cabecalho-app h1 { font-size: 2.5rem; }
+            .grid-alfabeto { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        }
+        @media (max-width: 768px) {
+            html { font-size: 88%; }
+            .barra-acessibilidade { justify-content: center; padding: 10px; }
+            .perfil-status { justify-content: center; width: 100%; }
+            .menu-toggle { display: block; width: 100%; max-width: 360px; }
+            nav.menu-principal { display: none; flex-direction: column; width: 100%; padding: 12px; background: #FFF; border-radius: 14px; }
+            nav.menu-principal.aberto { display: flex; }
+            .btn-tab { width: 100%; color: #1E293B; background: #F1F5F9; text-align: left; padding: 12px 16px; border-radius: 10px; }
+            .btn-tab.active { color: #FFF; background: var(--cor-sucesso); }
+            .cabecalho-app h1 { font-size: 2.1rem; }
+            .cartao { padding: 1.3rem; }
+            .grid-alfabeto { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .btn-letra { font-size: 2.6rem; height: 96px; }
+            .painel-desenho { height: 350px; }
+            #guia-fundo { font-size: 180px; }
+            .dica-inicial-box { font-size: 2rem; letter-spacing: 4px; padding: 10px 16px; }
+            .palavra-jogo-titulo { font-size: 2.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BARRA DE ACESSIBILIDADE E TROCA DIRETA DE PERFIL -->
+    <div class="barra-acessibilidade nao-imprimir" role="region" aria-label="Ferramentas de acessibilidade">
+        <div class="perfil-status">
+            <button type="button" id="btn-topo-aluno" class="btn-modo-topo ativo" onclick="GerenciadorPerfil.selecionar('aluno')">ÁREA DO ALUNO</button>
+            <button type="button" id="btn-topo-prof" class="btn-modo-topo prof" onclick="GerenciadorPerfil.solicitarSenhaProfessor()">PAINEL DO PROFESSOR</button>
+            <button type="button" class="btn-trocar-perfil" onclick="GerenciadorPerfil.abrirModal()">TELA INICIAL</button>
+        </div>
+        <div class="controles-acesso">
+            <button type="button" class="btn-acesso" onclick="AppConfig.alterarTamanhoFonte(10)">A+ AUMENTAR</button>
+            <button type="button" class="btn-acesso" onclick="AppConfig.alterarTamanhoFonte(-10)">A- DIMINUIR</button>
+            <button type="button" class="btn-acesso" id="btn-alto-contraste" onclick="AppConfig.alternarAltoContraste()" aria-pressed="false">ALTO CONTRASTE</button>
+        </div>
+    </div>
+
+    <!-- CABEÇALHO -->
+    <header class="cabecalho-app nao-imprimir">
+        <div class="logo-container">
+            <img src="kaiologoteste.jpg" alt="Logotipo PhoneticFace" class="logo-img" id="logo-principal"
+                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%23FFFFFF%27/%3E%3Ctext x=%2750%27 y=%2770%27 font-size=%2756%27 font-family=%27system-ui,sans-serif%27 font-weight=%27900%27 fill=%27%230056B3%27 text-anchor=%27middle%27%3EPf%3C/text%3E%3C/svg%3E';">
+            <div>
+                <h1>PHONETICFACE</h1>
+                <p id="mensagem-boas-vindas" class="tag-boas-vindas"></p>
+            </div>
+        </div>
+        <p class="subtitulo-topo">FERRAMENTA TECNOLÓGICA DE APOIO DOCENTE NO PROCESSO DE ALFABETIZAÇÃO</p>
+
+        <div id="container-navegacao-aluno">
+            <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-principal" onclick="toggleMenuMobile()">
+                MENU DE MÓDULOS
+            </button>
+
+            <nav id="menu-principal" class="menu-principal" role="tablist" aria-label="Módulos de aprendizagem">
+                <button type="button" class="btn-tab active" role="tab" aria-selected="true" data-target="aba-alfabeto">1. SONS DAS LETRAS</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-vogais">2. VOGAIS E CONS.</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-iniciais">3. SOM INICIAL</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-familias">4. UNINDO SONS</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-silabas">5. FORMAR SÍLABAS</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-palavras">6. FORMAR PALAVRAS</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-escrever">7. TRAÇADO</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-cores">8. CORES</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-nome">9. MEU NOME</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-dia-a-dia">10. LEITURA PRÁTICA</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-animais">11. VOCABULÁRIO</button>
+                <button type="button" class="btn-tab" role="tab" aria-selected="false" data-target="aba-numeros">12. NÚMEROS</button>
+                <button type="button" class="btn-tab tab-equipe" role="tab" aria-selected="false" data-target="aba-equipe">13. EQUIPE</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- =================================================================
+         AMBIENTE 1: MÓDULOS DO ALUNO (1 A 13)
+         ================================================================= -->
+    <main class="conteudo-app nao-imprimir" id="view-aluno">
+        
+        <!-- 1. SONS DAS LETRAS -->
+        <section id="aba-alfabeto" class="aba-conteudo active" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Toque em uma letra para assistir ao vídeo da docente.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div id="container-grid-alfabeto" class="grid-alfabeto"></div>
+        </section>
+
+        <!-- 2. VOGAIS E CONSOANTES -->
+        <section id="aba-vogais" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Vamos conhecer os sons das vogais e das consoantes. Toque nas letras.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="cartao">
+                <h2 class="titulo-centro">SONS DAS VOGAIS</h2>
+                <div class="flex-center box-tracejado" id="box-vogais" style="margin-bottom: 30px;"></div>
+                <h2 class="titulo-centro">SONS DAS CONSOANTES</h2>
+                <div class="flex-center box-tracejado" id="box-consoantes"></div>
+            </div>
+        </section>
+
+        <!-- 3. SOM INICIAL (ALEATÓRIO E COM MICROFONE) -->
+        <section id="aba-iniciais" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Ouça a palavra sorteada e escolha a letra que representa o seu som inicial.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="cartao" style="text-align: center;">
+                <div class="topo-jogo-flex">
+                    <span id="contador-iniciais" class="tag-etapa">DESAFIO ALEATÓRIO DE SOM INICIAL</span>
+                    <button type="button" class="btn-sortear" onclick="InteracaoApp.sortearNovaInicial()">SORTEAR OUTRA</button>
+                </div>
+                <h2 class="titulo-centro">IDENTIFIQUE O SOM INICIAL</h2>
+                <p id="categoria-inicial-dica" class="dica-categoria-palavra">DICA: OBJETO DO COTIDIANO</p>
+                <h3 id="nome-inicial-dica" aria-live="polite" class="dica-inicial-box">_ V I Ã O</h3>
+                <div style="margin: 20px 0; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" class="btn-ouvir-aux" onclick="InteracaoApp.ouvirPalavraInicial()">OUVIR PALAVRA</button>
+                    <button type="button" class="btn-microfone" id="btn-mic-inicial" onclick="ReconhecimentoVoz.ouvirAlunoInicial()">FALAR NO MICROFONE</button>
+                </div>
+                <div id="status-reconhecimento" class="status-mic-feedback">AGUARDANDO SUA VOZ...</div>
+                <div id="opcoes-iniciais" class="flex-center mt-20"></div>
+            </div>
+        </section>
+
+        <!-- 4. UNINDO SONS -->
+        <section id="aba-familias" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Escolha uma consoante para ver como ela se une com as vogais.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="cartao">
+                <h2 class="titulo-centro">ESCOLHA A CONSOANTE:</h2>
+                <div class="flex-center" id="botoes-familias"></div>
+                <hr class="divisor-tracejado">
+                <h2 id="titulo-familia-atual" class="titulo-centro" style="color: var(--cor-sucesso);">UNIÃO DE SONS:</h2>
+                <div class="flex-center" id="resultado-familia" style="margin-top: 15px;"></div>
+            </div>
+        </section>
+
+        <!-- 5. FORMAR SÍLABAS (ARRASTAR CIMA/BAIXO E LETRAS MISTURADAS) -->
+        <section id="aba-silabas" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Arraste as colunas ou toque nas letras misturadas para formar sílabas e palavras.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+
+            <div class="cartao">
+                <h2 class="titulo-centro">CONSTRUTOR INTERATIVO DE SÍLABAS</h2>
+                <div class="construtor-silaba-wrapper">
+                    <div class="coluna-seletor" id="roleta-consoante">
+                        <button type="button" class="btn-seta-roleta" onclick="ConstrutorSilabas.mudarConsoante(-1)">SUBIR</button>
+                        <div class="visor-roleta" id="visor-consoante-ativa">B</div>
+                        <button type="button" class="btn-seta-roleta" onclick="ConstrutorSilabas.mudarConsoante(1)">DESCER</button>
+                        <span class="legenda-roleta">CONSOANTE</span>
+                    </div>
+                    <div class="sinal-operacao">+</div>
+                    <div class="coluna-seletor" id="roleta-vogal">
+                        <button type="button" class="btn-seta-roleta" onclick="ConstrutorSilabas.mudarVogal(-1)">SUBIR</button>
+                        <div class="visor-roleta vogal" id="visor-vogal-ativa">A</div>
+                        <button type="button" class="btn-seta-roleta" onclick="ConstrutorSilabas.mudarVogal(1)">DESCER</button>
+                        <span class="legenda-roleta">VOGAL</span>
+                    </div>
+                    <div class="sinal-operacao">=</div>
+                    <button type="button" class="painel-resultado-silaba" onclick="ConstrutorSilabas.falarResultadoAtual()">
+                        <span class="silaba-formada-grande" id="texto-silaba-formada">BA</span>
+                        <span class="palavra-exemplo-silaba" id="texto-palavra-silaba">BA DE BANANA</span>
+                        <span class="instrucao-toque-silaba">TOQUE PARA OUVIR</span>
+                    </button>
+                </div>
+                <hr class="divisor-tracejado">
+                <div class="topo-jogo-flex" style="margin-bottom: 12px;">
+                    <h3 style="font-size: 1.1rem; color: var(--cor-texto-principal);">LETRAS MISTURADAS:</h3>
+                    <button type="button" class="btn-sortear" onclick="ConstrutorSilabas.embaralharLetrasMisturadas()">EMBARALHAR</button>
+                </div>
+                <div class="flex-center box-tracejado" id="painel-letras-misturadas"></div>
+            </div>
+
+            <div id="container-silabas" class="area-silabas"></div>
+        </section>
+
+        <!-- 6. FORMAR PALAVRAS (DINÂMICO E COM MICROFONE) -->
+        <section id="aba-palavras" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Toque nas sílabas na ordem correta ou use o microfone para falar a palavra.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="cartao" style="text-align: center;">
+                <div class="topo-jogo-flex">
+                    <span id="contador-palavras" class="tag-etapa">MODO DINÂMICO</span>
+                    <button type="button" class="btn-sortear" onclick="InteracaoApp.proximaPalavra()">NOVA PALAVRA</button>
+                </div>
+                <h2 id="dica-palavra" class="palavra-jogo-titulo">BONECA</h2>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
+                    <button type="button" class="btn-ouvir-aux" onclick="Voz.falar(document.getElementById('dica-palavra').innerText)">OUVIR PALAVRA</button>
+                    <button type="button" class="btn-microfone" onclick="ReconhecimentoVoz.ouvirPalavraCompleta()">FALAR PALAVRA</button>
+                </div>
+                <div id="status-rec-palavra" class="status-mic-feedback">AGUARDANDO SUA VOZ...</div>
+                <div id="slots-palavra" class="flex-center" style="margin: 25px 0;"></div>
+                <div id="silabas-soltas" class="flex-center"></div>
+                <button type="button" class="btn-acao" style="margin-top: 35px; width: auto; font-size: 1.3rem; padding: 16px 34px;" onclick="InteracaoApp.proximaPalavra()">PRÓXIMA PALAVRA</button>
+            </div>
+        </section>
+
+        <!-- 7. TRAÇADO -->
+        <section id="aba-escrever" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Escolha uma letra e contorne todo o formato dela do início ao fim.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="cartao">
+                <h2 class="titulo-centro" style="font-size: 1.5rem;">TREINO MOTOR DE CALIGRAFIA</h2>
+                <div class="ferramentas-canvas" id="botoes-desenho"></div>
+                <div id="aviso-tracado" class="barra-status-tracado">CONTORNE A LETRA INTEIRA SOBRE O MOLDE ABAIXO</div>
+                <div class="painel-desenho" id="container-canvas">
+                    <div id="guia-fundo">A</div>
+                    <canvas id="canvas-caligrafia"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. CORES -->
+        <section id="aba-cores" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Toque nas cores para ouvir o nome de cada uma.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="grid-alfabeto" id="container-cores" style="grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));"></div>
+        </section>
+
+        <!-- 9. MEU NOME -->
+        <section id="aba-nome" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Digite o seu nome na caixa abaixo e confirme para salvar.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="cartao" style="text-align: center;">
+                <h2 class="titulo-centro">COMO VOCÊ SE CHAMA?</h2>
+                <input type="text" id="input-nome" class="input-gigante" placeholder="DIGITE AQUI..." autocomplete="off">
+                <div style="margin-top: 25px;">
+                    <button type="button" class="btn-acao" style="max-width: 500px; font-size: 1.5rem;" onclick="InteracaoApp.verificarNome()">
+                        CONFIRMAR NOME E SALVAR
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. LEITURA PRÁTICA (COM FILTRO B2B MUNDO DO TRABALHO) -->
+        <section id="aba-dia-a-dia" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Pratique a leitura de textos do cotidiano, receitas, letreiros e normas de segurança no trabalho.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="topo-jogo-flex" style="margin-bottom: 18px;">
+                <h3 style="font-size: 1.25rem; color: var(--cor-texto-principal);">FILTRAR CONTEÚDO PRÁTICO:</h3>
+                <div class="filtros-prof">
+                    <button type="button" class="btn-filtro active" onclick="LeituraPraticaApp.filtrar('todos', this)">TODOS OS TEMAS</button>
+                    <button type="button" class="btn-filtro" onclick="LeituraPraticaApp.filtrar('trabalho', this)">MUNDO DO TRABALHO & SEGURANÇA (NRS)</button>
+                    <button type="button" class="btn-filtro" onclick="LeituraPraticaApp.filtrar('geral', this)">COTIDIANO E SAÚDE</button>
+                </div>
+            </div>
+            <div class="grid-cards" id="container-dia-a-dia"></div>
+        </section>
+
+        <!-- 11. VOCABULÁRIO -->
+        <section id="aba-animais" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Toque nos cartões para ouvir a pronúncia e expandir o seu vocabulário.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="grid-cards" id="container-animais"></div>
+        </section>
+
+        <!-- 12. NÚMEROS -->
+        <section id="aba-numeros" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Toque em qualquer número de 1 a 100 para ouvir a sua pronúncia.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="cartao">
+                <h2 class="titulo-centro" style="margin-bottom: 25px;">NÚMEROS DE 1 A 100</h2>
+                <div class="grid-numeros" id="container-numeros"></div>
+            </div>
+        </section>
+
+        <!-- 13. EQUIPE -->
+        <section id="aba-equipe" class="aba-conteudo" role="tabpanel">
+            <div class="bloco-instrucao">
+                <button type="button" class="btn-instrucao" onclick="Voz.falar('Conheça a equipe responsável pelo desenvolvimento e aplicação pedagógica da ferramenta.')">
+                    OUVIR INSTRUÇÃO DO MÓDULO
+                </button>
+            </div>
+            <div class="cartao" style="text-align: center;">
+                <h2 class="titulo-centro" style="margin-bottom: 30px;">EQUIPE DO PROJETO</h2>
+                <div class="flex-center" style="gap: 30px;">
+                    <div class="card-docente">
+                        <img src="imgem1.jpg" alt="Polyana de Lima Santana" onerror="this.src='https://placehold.co/200x260/0056B3/FFF?text=Polyana'">
+                        <h3>POLYANA DE LIMA SANTANA</h3>
+                        <p>EQUIPE DOCENTE / AUTORA</p>
+                    </div>
+                    <div class="card-docente">
+                        <img src="imgem2.jpg" alt="Stefany Senger Roza" onerror="this.src='https://placehold.co/200x260/0056B3/FFF?text=Stefany'">
+                        <h3>STEFANY SENGER ROZA</h3>
+                        <p>EQUIPE TÉCNICA / AUTORA</p>
+                    </div>
+                    <div class="card-docente">
+                        <img src="imgem3.jpg" alt="Maria Eduarda da Mota Oliveira" onerror="this.src='https://placehold.co/200x260/0056B3/FFF?text=Maria+Eduarda'">
+                        <h3>MARIA EDUARDA DA MOTA OLIVEIRA</h3>
+                        <p>EQUIPE DOCENTE / AUTORA</p>
+                    </div>
+                </div>
+                <p style="margin-top: 35px; font-size: 1.25rem; color: var(--cor-texto-secundario); font-weight: 800;">
+                    Criador da Ferramenta: Kaio Daniel de Souza da Costa <br>
+                    Professor Monitor: Felipe Oliveira Souza <br>
+                    <span style="color: var(--cor-primaria);">Colégio Estadual Professora Ivone Soares Castanharo</span>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- =================================================================
+         AMBIENTE 2: PAINEL DO PROFESSOR (COM SENHA, EXPORTAÇÃO E IMPRESSÃO 1 POR FOLHA)
+         ================================================================= -->
+    <main class="conteudo-app nao-imprimir" id="view-professor" style="display: none;">
+        <div class="cartao painel-professor-topo">
+            <div class="cabecalho-painel-flex">
+                <div>
+                    <span class="tag-institucional">RELATÓRIO PEDAGÓGICO EJA — PARANÁ</span>
+                    <h2 style="font-size: 2rem; color: var(--cor-primaria); margin-top: 8px;">PAINEL DE GESTÃO DO PROFESSOR</h2>
+                    <p style="color: var(--cor-texto-secundario); font-weight: 600;">Acompanhamento de tarefas concluídas no dia, dificuldades fônicas, idade, série e emissão de prontuários individuais.</p>
+                </div>
+                <div class="botoes-topo-prof">
+                    <button type="button" class="btn-secundario-prof" onclick="GerenciadorPerfil.exportarExcelCSV()">EXPORTAR PLANILHA (.CSV)</button>
+                    <button type="button" class="btn-secundario-prof" onclick="GerenciadorPerfil.imprimirSelecionados()">IMPRIMIR SELECIONADOS (1 POR FOLHA)</button>
+                    <button type="button" class="btn-secundario-prof" onclick="GerenciadorPerfil.imprimirTodosIndividual()">IMPRIMIR TODOS (1 POR FOLHA)</button>
+                    <button type="button" class="btn-primario-prof" onclick="GerenciadorPerfil.selecionar('aluno')">VER ÁREA DO ALUNO</button>
+                </div>
+            </div>
+
+            <div class="grid-metricas">
+                <div class="card-metrica">
+                    <h3 id="kpi-total-alunos">6</h3>
+                    <p>ALUNOS REGISTRADOS</p>
+                </div>
+                <div class="card-metrica sucesso">
+                    <h3>56</h3>
+                    <p>TAREFAS FEITAS HOJE</p>
+                </div>
+                <div class="card-metrica alerta">
+                    <h3>MÓDULO 6</h3>
+                    <p>MAIOR DIFICULDADE (PALAVRAS)</p>
+                </div>
+                <div class="card-metrica roxo">
+                    <h3>1 ALUNO</h3>
+                    <p>APOIO PARA MEXER NO APP</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULÁRIO DE CADASTRO RÁPIDO DE ALUNO -->
+        <div class="cartao">
+            <h3 style="font-size: 1.25rem; margin-bottom: 14px; color: var(--cor-texto-principal);">CADASTRAR NOVO ESTUDANTE NO SISTEMA</h3>
+            <div class="form-cadastro-aluno">
+                <input type="text" id="novo-aluno-nome" placeholder="Nome completo do estudante" class="input-padrao">
+                <input type="number" id="novo-aluno-idade" placeholder="Idade" min="15" max="110" class="input-padrao" style="max-width: 100px;">
+                <select id="novo-aluno-perfil" class="input-padrao" style="max-width: 170px;">
+                    <option value="Jovem">Jovem</option>
+                    <option value="Pessoa Adulta" selected>Pessoa Adulta</option>
+                    <option value="Pessoa Adulta +">Pessoa Adulta +</option>
+                </select>
+                <select id="novo-aluno-serie" class="input-padrao" style="max-width: 240px;">
+                    <option value="EJA - Etapa Inicial (Alfabetização)">EJA - Etapa Inicial (Alfabetização)</option>
+                    <option value="EJA - Fase I (1º Segmento)">EJA - Fase I (1º Segmento)</option>
+                    <option value="EJA - Fase II (2º Segmento)">EJA - Fase II (2º Segmento)</option>
+                </select>
+                <button type="button" class="btn-primario-prof" onclick="GerenciadorPerfil.adicionarNovoAluno()">CADASTRAR ESTUDANTE</button>
+            </div>
+        </div>
+
+        <div class="cartao">
+            <div class="cabecalho-painel-flex" style="margin-bottom: 18px;">
+                <div>
+                    <h3 style="font-size: 1.4rem;">REGISTRO NOMINAL E DIAGNÓSTICO INDIVIDUAL</h3>
+                    <p style="font-size: 0.88rem; color: var(--cor-texto-secundario);">Marque a caixa à esquerda para selecionar os alunos que deseja imprimir (cada estudante sai em uma página separada).</p>
+                </div>
+                <div class="filtros-prof">
+                    <button type="button" class="btn-filtro active" onclick="GerenciadorPerfil.filtrarAlunos('todos', this)">TODOS</button>
+                    <button type="button" class="btn-filtro" onclick="GerenciadorPerfil.filtrarAlunos('dificuldade', this)">DIFICULDADE</button>
+                    <button type="button" class="btn-filtro" onclick="GerenciadorPerfil.filtrarAlunos('plataforma', this)">APOIO NO APP</button>
+                    <button type="button" class="btn-filtro" onclick="GerenciadorPerfil.filtrarAlunos('otimo', this)">AVANÇADOS</button>
+                </div>
+            </div>
+
+            <div class="tabela-container">
+                <table class="tabela-professor">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;">
+                                <input type="checkbox" id="check-todos-alunos" onchange="GerenciadorPerfil.alternarSelecaoTodos(this.checked)" title="Selecionar todos">
+                            </th>
+                            <th>ALUNO</th>
+                            <th>IDADE / PERFIL</th>
+                            <th>SÉRIE / ETAPA</th>
+                            <th>TAREFAS NO DIA</th>
+                            <th style="min-width: 140px;">PROGRESSO</th>
+                            <th>ATIVIDADES E DIAGNÓSTICO REGISTRADO</th>
+                            <th>AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-alunos-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- ÁREA EXCLUSIVA DE IMPRESSÃO (1 ALUNO POR FOLHA) -->
+    <div id="area-impressao-relatorios" class="apenas-impressao"></div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="rodape-app nao-imprimir">
+        <div class="container-creditos">
+            <div class="coluna-creditos">
+                <div style="font-size: 2rem; font-weight: 900; color: var(--cor-secundaria);">PHONETICFACE</div>
+                <p style="margin-top: 8px; font-weight: bold;">FERRAMENTA TECNOLÓGICA DE APOIO DOCENTE NO PROCESSO DE ALFABETIZAÇÃO</p>
+                <p style="margin-top: 12px; color: var(--cor-alerta); font-size: 1.05rem;"><strong>ALINHADO AO PBA — DESAFIO EPT 2026</strong></p>
+            </div>
+            <div class="coluna-creditos">
+                <h3>DESENVOLVIMENTO E AUTORIA</h3>
+                <p><strong>CRIADOR DA FERRAMENTA:</strong> KAIO DANIEL DE SOUZA DA COSTA</p>
+                <p><strong>EQUIPE:</strong> STEFANY SENGER ROZA, POLYANA DE LIMA SANTANA E MARIA EDUARDA DA MOTA OLIVEIRA</p>
+                <p><strong>PROFESSOR MONITOR:</strong> FELIPE OLIVEIRA SOUZA</p>
+            </div>
+            <div class="coluna-creditos">
+                <h3>INSTITUIÇÃO</h3>
+                <p><strong>C.E. PROF. IVONE SOARES CASTANHARO</strong></p>
+                <p><strong>DIREÇÃO GERAL:</strong> TANIA SIDNEI | <strong>COORDENAÇÃO:</strong> MARIDALVA E CIDINEI</p>
+            </div>
+        </div>
+        <div class="rodape-legal">
+            <p>Todos os direitos reservados e protegidos nos termos da Constituição Federal (art. 5º, incisos V e X) e do Código Civil (art. 20). A divulgação, o uso e o compartilhamento de imagens, vozes e dados observam rigorosamente o Estatuto Digital da Criança e do Adolescente (Lei nº 15.211/2025) e a LGPD (Lei nº 13.709/2018). Autorizado exclusivamente para fins educacionais.</p>
+        </div>
+    </footer>
+
+    <!-- BANNER DE COOKIES (LGPD) -->
+    <div id="banner-cookies" class="banner-cookies nao-imprimir" role="dialog" aria-label="Aviso de cookies e privacidade" style="display: none;">
+        <div class="banner-cookies-texto">
+            <strong>AVISO DE COOKIES E LGPD:</strong> Utilizamos armazenamento local exclusivamente para salvar o progresso das lições, o nome do estudante e as preferências de acessibilidade visual.
+        </div>
+        <div class="banner-cookies-botoes">
+            <button type="button" class="btn-cookie-aceitar" onclick="GerenciadorCookies.aceitar()">ACEITAR COOKIES</button>
+            <button type="button" class="btn-cookie-recusar" onclick="GerenciadorCookies.fechar()">ESSENCIAIS</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE SELEÇÃO INICIAL: ALUNO OU PROFESSOR -->
+    <div id="modal-selecao-perfil" class="modal-overlay visivel nao-imprimir">
+        <div class="modal-caixa modal-entrada">
+            <span class="tag-institucional">PLATAFORMA EDUCACIONAL EJA</span>
+            <h2 style="font-size: 2.2rem; color: var(--cor-primaria); margin: 10px 0 6px;">BEM-VINDO AO PHONETICFACE</h2>
+            <p style="font-size: 1.05rem; color: var(--cor-texto-secundario); font-weight: 600; margin-bottom: 22px;">Ferramenta Tecnológica de Apoio Docente no Processo de Alfabetização. Selecione seu perfil:</p>
+
+            <div class="grid-entrada-perfis">
+                <div class="card-escolha-perfil">
+                    <div class="selo-perfil azul">ALUNO</div>
+                    <h3>AMBIENTE DO ESTUDANTE</h3>
+                    <p>Acesso aos 13 módulos de alfabetização fônica, vídeos das docentes de A a Z, construtor de sílabas, palavras, traçado e números.</p>
+                    <button type="button" class="btn-entrar-sistema azul" onclick="GerenciadorPerfil.selecionar('aluno')">
+                        ENTRAR NAS LIÇÕES
+                    </button>
+                </div>
+
+                <div class="card-escolha-perfil">
+                    <div class="selo-perfil roxo">PROFESSOR</div>
+                    <h3>PAINEL DO PROFESSOR</h3>
+                    <p>Gestão pedagógica, acompanhamento de tarefas, idade, série escolar, diagnóstico e emissão de prontuários individuais.</p>
+                    <button type="button" class="btn-entrar-sistema roxo" onclick="GerenciadorPerfil.solicitarSenhaProfessor()">
+                        ABRIR PAINEL DO PROFESSOR
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE SENHA DE ACESSO DO PROFESSOR -->
+    <div id="modal-senha-professor" class="modal-overlay nao-imprimir">
+        <div class="modal-caixa" style="max-width: 440px;">
+            <span class="tag-institucional">SEGURANÇA DE DADOS (LGPD)</span>
+            <h2 style="font-size: 1.6rem; color: var(--cor-roxo); margin: 10px 0 10px;">CREDENCIAL DOCENTE</h2>
+            <p style="font-size: 0.92rem; color: var(--cor-texto-secundario); font-weight: 600; margin-bottom: 18px;">Digite a senha de acesso ao Painel do Professor:</p>
+            <input type="password" id="input-senha-prof" class="input-padrao" placeholder="Senha (ex: prof2026)" style="width: 100%; text-align: center; font-size: 1.2rem; margin-bottom: 14px;">
+            <div id="erro-senha-prof" style="color: var(--cor-destaque); font-weight: 800; font-size: 0.85rem; margin-bottom: 12px; display: none;">SENHA INCORRETA. TENTE NOVAMENTE.</div>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn-secundario-prof" style="flex:1;" onclick="GerenciadorPerfil.fecharSenhaProfessor()">CANCELAR</button>
+                <button type="button" class="btn-primario-prof" style="flex:1;" onclick="GerenciadorPerfil.validarSenhaProfessor()">ACESSAR PAINEL</button>
+            </div>
+            <div style="margin-top: 14px;">
+                <button type="button" class="btn-sortear" style="font-size: 0.78rem;" onclick="GerenciadorPerfil.preencherSenhaDemo()">⚡ PREENCHER SENHA DEMO (APRESENTAÇÃO)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE VÍDEO DO ALFABETO -->
+    <div id="modal-letras" class="modal-overlay nao-imprimir" role="dialog" aria-modal="true" aria-labelledby="letra-display">
+        <div class="modal-caixa">
+            <h1 id="letra-display">A</h1>
+            <div class="video-wrapper">
+                <iframe id="player-youtube" src="" title="Vídeo demonstrativo da letra" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+            <div class="modal-info-palavra">
+                <p id="modal-texto-palavra">A DE ABELHA</p>
+            </div>
+            <div style="margin-bottom: 12px;">
+                <a id="link-youtube-direto" href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="link-reserva-video">Assistir diretamente no YouTube</a>
+            </div>
+            <button type="button" class="btn-acao" style="font-size: 1.3rem; padding: 14px;" onclick="InterfaceModal.fechar()">FECHAR VÍDEO</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE FICHA INDIVIDUAL DO ALUNO -->
+    <div id="modal-ficha-aluno" class="modal-overlay nao-imprimir">
+        <div class="modal-caixa" style="max-width: 660px; text-align: left;">
+            <span class="tag-institucional">PRONTUÁRIO PEDAGÓGICO INDIVIDUAL</span>
+            <h2 id="ficha-nome-aluno" style="color: var(--cor-primaria); font-size: 1.75rem; margin-top: 8px;">NOME DO ALUNO</h2>
+            <p id="ficha-resumo-aluno" style="font-weight: 700; color: var(--cor-texto-secundario); margin-bottom: 15px;"></p>
+            <div id="ficha-corpo-detalhes" class="ficha-detalhes-box"></div>
+            <div class="flex-center" style="margin-top: 22px; justify-content: flex-end;">
+                <button type="button" class="btn-secundario-prof" onclick="GerenciadorPerfil.ouvirFichaAtual()">OUVIR PARECER</button>
+                <button type="button" class="btn-primario-prof" onclick="GerenciadorPerfil.imprimirAlunoUnico(GerenciadorPerfil.indiceFichaAberta)">IMPRIMIR ESTE ALUNO (1 FOLHA)</button>
+                <button type="button" class="btn-acao" style="width: auto; padding: 12px 24px; font-size: 1rem;" onclick="GerenciadorPerfil.fecharFicha()">FECHAR FICHA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOTOR JAVASCRIPT UNIFICADO INTEGRADO NO PRÓPRIO HTML -->
+    <script>
+        (function () {
+            'use strict';
+
+            if (window.__PHONETICFACE_READY__) return;
+            window.__PHONETICFACE_READY__ = true;
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function (regs) {
+                    for (var i = 0; i < regs.length; i++) regs[i].unregister();
+                }).catch(function () {});
+            }
+
+            function lerStorage(chave, padrao) {
+                try {
+                    var v = localStorage.getItem(chave);
+                    return v !== null ? v : padrao;
+                } catch (e) { return padrao; }
+            }
+
+            function salvarStorage(chave, valor) {
+                try { localStorage.setItem(chave, String(valor)); } catch (e) {}
+            }
+
+            function embaralharArray(arr) {
+                var copia = arr.slice();
+                for (var i = copia.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = copia[i];
+                    copia[i] = copia[j];
+                    copia[j] = temp;
+                }
+                return copia;
+            }
+
+            function toggleMenuMobile() {
+                var menu = document.getElementById('menu-principal');
+                var btn = document.querySelector('.menu-toggle');
+                if (menu) {
+                    var aberto = menu.classList.toggle('aberto');
+                    if (btn) btn.setAttribute('aria-expanded', String(aberto));
+                }
+            }
+
+            var MapaFoneticoVogais = { 'A': 'á', 'E': 'é', 'I': 'í', 'O': 'ó', 'U': 'ú' };
+            var MapaFoneticoConsoantes = {
+                'B': 'bê', 'C': 'cê', 'D': 'dê', 'F': 'éfe', 'G': 'gê', 'H': 'agá',
+                'J': 'jóta', 'K': 'cá', 'L': 'éle', 'M': 'ême', 'N': 'êne', 'P': 'pê',
+                'Q': 'quê', 'R': 'érre', 'S': 'ésse', 'T': 'tê', 'V': 'vê', 'W': 'dáblio',
+                'X': 'xís', 'Y': 'ípsilon', 'Z': 'zê'
+            };
+            var MapaFoneticoSilabas = {
+                'BA': 'bá', 'BE': 'bê', 'BI': 'bí', 'BO': 'bó', 'BU': 'bú',
+                'CA': 'cá', 'CE': 'cê', 'CI': 'cí', 'CO': 'có', 'CU': 'cú',
+                'DA': 'dá', 'DE': 'dê', 'DI': 'dí', 'DO': 'dó', 'DU': 'dú',
+                'FA': 'fá', 'FE': 'fê', 'FI': 'fí', 'FO': 'fó', 'FU': 'fú',
+                'GA': 'gá', 'GE': 'gê', 'GI': 'gí', 'GO': 'gó', 'GU': 'gú',
+                'HA': 'á',  'HE': 'ê',  'HI': 'í',  'HO': 'ó',  'HU': 'ú',
+                'JA': 'já', 'JE': 'jê', 'JI': 'jí', 'JO': 'jó', 'JU': 'jú',
+                'LA': 'lá', 'LE': 'lê', 'LI': 'lí', 'LO': 'ló', 'LU': 'lú',
+                'MA': 'má', 'ME': 'mê', 'MI': 'mí', 'MO': 'mó', 'MU': 'mú',
+                'NA': 'ná', 'NE': 'nê', 'NI': 'ní', 'NO': 'nó', 'NU': 'nú',
+                'PA': 'pá', 'PE': 'pê', 'PI': 'pí', 'PO': 'pó', 'PU': 'pú',
+                'RA': 'rrá','RE': 'rrê','RI': 'rrí','RO': 'rró','RU': 'rrú',
+                'SA': 'sá', 'SE': 'sê', 'SI': 'sí', 'SO': 'só', 'SU': 'sú',
+                'TA': 'tá', 'TE': 'tê', 'TI': 'tí', 'TO': 'tó', 'TU': 'tú',
+                'VA': 'vá', 'VE': 'vê', 'VI': 'ví', 'VO': 'vó', 'VU': 'vú',
+                'XA': 'xá', 'XE': 'xê', 'XI': 'xí', 'XO': 'xó', 'XU': 'xú',
+                'ZA': 'zá', 'ZE': 'zê', 'ZI': 'zí', 'ZO': 'zó', 'ZU': 'zú'
+            };
+            var ExemplosSilabas = {
+                'BA': 'BANANA', 'BE': 'BEBÊ', 'BI': 'BICO', 'BO': 'BOLA', 'BU': 'BULE',
+                'CA': 'CASA', 'CE': 'CEBOLA', 'CI': 'CIDADE', 'CO': 'COPO', 'CU': 'CUBO',
+                'DA': 'DADO', 'DE': 'DEDO', 'DI': 'DINHEIRO', 'DO': 'DOCE', 'DU': 'DUELO',
+                'FA': 'FACA', 'FE': 'FEIJÃO', 'FI': 'FITA', 'FO': 'FOGO', 'FU': 'FUBÁ',
+                'GA': 'GATO', 'GE': 'GELO', 'GI': 'GIRAFA', 'GO': 'GOLA', 'GU': 'GUGA',
+                'JA': 'JANELA', 'JO': 'JOGO', 'JU': 'CAJU',
+                'LA': 'LATA', 'LE': 'LEITE', 'LI': 'LIVRO', 'LO': 'LOBO', 'LU': 'LUA',
+                'MA': 'MALA', 'ME': 'MESA', 'MI': 'MILHO', 'MO': 'MOTO', 'MU': 'MURO',
+                'NA': 'NAVIO', 'NE': 'NEVE', 'NI': 'NINHO', 'NO': 'NOITE', 'NU': 'NUVEM',
+                'PA': 'PATO', 'PE': 'PEIXE', 'PI': 'PIPOCA', 'PO': 'PORTA', 'PU': 'PUDIM',
+                'RA': 'RATO', 'RE': 'REDE', 'RI': 'RIO', 'RO': 'RODA', 'RU': 'RUA',
+                'SA': 'SAPO', 'SE': 'SELO', 'SI': 'SINO', 'SO': 'SOPA', 'SU': 'SUCO',
+                'TA': 'TATU', 'TE': 'TELA', 'TI': 'TIJOLO', 'TO': 'TOMATE', 'TU': 'TUBARÃO',
+                'VA': 'VACA', 'VE': 'VELA', 'VI': 'VIOLÃO', 'VO': 'VOVÓ', 'VU': 'VULCÃO',
+                'XA': 'XALE', 'XI': 'XÍCARA', 'ZE': 'ZEBRA'
+            };
+
+            var BancoDados = {
+                alfabeto: [
+                    { letra: 'A', palavra: 'ABELHA', youtubeId: 'XBCDUG-yEaw' },
+                    { letra: 'B', palavra: 'BOLA', youtubeId: 'j6ROsDM87UU' },
+                    { letra: 'C', palavra: 'CASA', youtubeId: 'hWZA7DElS_I' },
+                    { letra: 'D', palavra: 'DADO', youtubeId: 'mAIWY3S12s4' },
+                    { letra: 'E', palavra: 'ELEFANTE', youtubeId: '8s43APNFMtM' },
+                    { letra: 'F', palavra: 'FACA', youtubeId: 'nuX0O_hqoFM' },
+                    { letra: 'G', palavra: 'GATO', youtubeId: '4SjEf5gYXio' },
+                    { letra: 'H', palavra: 'HORA', youtubeId: 'NhZ6eVHmVDA' },
+                    { letra: 'I', palavra: 'IGREJA', youtubeId: 'ILhan-Htj0g' },
+                    { letra: 'J', palavra: 'JACARÉ', youtubeId: 'Z9lBor1lnI8' },
+                    { letra: 'K', palavra: 'KIWI', youtubeId: 'eGrZ1WM_oaE' },
+                    { letra: 'L', palavra: 'LÁPIS', youtubeId: 'tC3yWQPeNpE' },
+                    { letra: 'M', palavra: 'MALA', youtubeId: 'mH3byoH67O4' },
+                    { letra: 'N', palavra: 'NAVIO', youtubeId: 'AGPxKWabjSc' },
+                    { letra: 'O', palavra: 'ÓCULOS', youtubeId: '-8RtEgO3Y5s' },
+                    { letra: 'P', palavra: 'PATO', youtubeId: 'bmQ_2UA7sWw' },
+                    { letra: 'Q', palavra: 'QUEIJO', youtubeId: '-qZ5fNtr-8g' },
+                    { letra: 'R', palavra: 'RATO', youtubeId: '7fKcMXcBNOA' },
+                    { letra: 'S', palavra: 'SAPO', youtubeId: 's6XAkz5lGxA' },
+                    { letra: 'T', palavra: 'TATU', youtubeId: '-FyHvZ9Hz0Y' },
+                    { letra: 'U', palavra: 'UVA', youtubeId: 'beFXQ-w5CKs' },
+                    { letra: 'V', palavra: 'VACA', youtubeId: 'cGJ2MXDMsgE' },
+                    { letra: 'W', palavra: 'WEB', youtubeId: 'An41gHwcEEw' },
+                    { letra: 'X', palavra: 'XÍCARA', youtubeId: 'zqrqp-RHFHs' },
+                    { letra: 'Y', palavra: 'YOUTUBE', youtubeId: 'NJLEAbML25A' },
+                    { letra: 'Z', palavra: 'ZEBRA', youtubeId: '-QBkzFZDWNU' }
+                ],
+                vogais: ['A','E','I','O','U'],
+                consoantes: ['B','C','D','F','G','H','J','K','L','M','N','P','Q','R','S','T','V','W','X','Y','Z'],
+                sinaisDesenho: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
+                iniciais: [
+                    { img: '✈️', nome: 'AVIÃO', certa: 'A', cat: 'TRANSPORTE' }, { img: '🍍', nome: 'ABACAXI', certa: 'A', cat: 'ALIMENTO' },
+                    { img: '💍', nome: 'ANEL', certa: 'A', cat: 'OBJETO' }, { img: '🐝', nome: 'ABELHA', certa: 'A', cat: 'NATUREZA' },
+                    { img: '🍌', nome: 'BANANA', certa: 'B', cat: 'ALIMENTO' }, { img: '⚽', nome: 'BOLA', certa: 'B', cat: 'ESPORTE' },
+                    { img: '🚲', nome: 'BICICLETA', certa: 'B', cat: 'TRANSPORTE' }, { img: '🇧🇷', nome: 'BRASIL', certa: 'B', cat: 'PAÍS' },
+                    { img: '🏠', nome: 'CASA', certa: 'C', cat: 'MORADIA' }, { img: '🚗', nome: 'CARRO', certa: 'C', cat: 'TRANSPORTE' },
+                    { img: '🐎', nome: 'CAVALO', certa: 'C', cat: 'ANIMAL' }, { img: '💻', nome: 'COMPUTADOR', certa: 'C', cat: 'TECNOLOGIA' },
+                    { img: '📓', nome: 'CADERNO', certa: 'C', cat: 'ESCOLA' }, { img: '🎲', nome: 'DADO', certa: 'D', cat: 'OBJETO' },
+                    { img: '💵', nome: 'DINHEIRO', certa: 'D', cat: 'CIDADANIA' }, { img: '🦷', nome: 'DENTE', certa: 'D', cat: 'SAÚDE' },
+                    { img: '🐘', nome: 'ELEFANTE', certa: 'E', cat: 'ANIMAL' }, { img: '🏫', nome: 'ESCOLA', certa: 'E', cat: 'EDUCAÇÃO' },
+                    { img: '🪜', nome: 'ESCADA', certa: 'E', cat: 'OBJETO' }, { img: '⭐', nome: 'ESTRELA', certa: 'E', cat: 'NATUREZA' },
+                    { img: '🔪', nome: 'FACA', certa: 'F', cat: 'COZINHA' }, { img: '🍲', nome: 'FEIJÃO', certa: 'F', cat: 'ALIMENTO' },
+                    { img: '👨‍👩‍👧‍👦', nome: 'FAMÍLIA', certa: 'F', cat: 'SOCIEDADE' }, { img: '🐈', nome: 'GATO', certa: 'G', cat: 'ANIMAL' },
+                    { img: '🐔', nome: 'GALINHA', certa: 'G', cat: 'ANIMAL' }, { img: '🍴', nome: 'GARFO', certa: 'G', cat: 'COZINHA' },
+                    { img: '⛪', nome: 'IGREJA', certa: 'I', cat: 'COMUNIDADE' }, { img: '🏝️', nome: 'ILHA', certa: 'I', cat: 'GEOGRAFIA' },
+                    { img: '🐊', nome: 'JACARÉ', certa: 'J', cat: 'ANIMAL' }, { img: '🪟', nome: 'JANELA', certa: 'J', cat: 'MORADIA' },
+                    { img: '✏️', nome: 'LÁPIS', certa: 'L', cat: 'ESCOLA' }, { img: '🦁', nome: 'LEÃO', certa: 'L', cat: 'ANIMAL' },
+                    { img: '🍊', nome: 'LARANJA', certa: 'L', cat: 'ALIMENTO' }, { img: '📖', nome: 'LIVRO', certa: 'L', cat: 'EDUCAÇÃO' },
+                    { img: '🧳', nome: 'MALA', certa: 'M', cat: 'OBJETO' }, { img: '🍎', nome: 'MAÇÃ', certa: 'M', cat: 'ALIMENTO' },
+                    { img: '🐒', nome: 'MACACO', certa: 'M', cat: 'ANIMAL' }, { img: '🪵', nome: 'MESA', certa: 'M', cat: 'MÓVEL' },
+                    { img: '🚢', nome: 'NAVIO', certa: 'N', cat: 'TRANSPORTE' }, { img: '☁️', nome: 'NUVEM', certa: 'N', cat: 'NATUREZA' },
+                    { img: '👁️', nome: 'OLHO', certa: 'O', cat: 'CORPO HUMANO' }, { img: '👓', nome: 'ÓCULOS', certa: 'O', cat: 'OBJETO' },
+                    { img: '🥚', nome: 'OVO', certa: 'O', cat: 'ALIMENTO' }, { img: '🥘', nome: 'PANELA', certa: 'P', cat: 'COZINHA' },
+                    { img: '🦆', nome: 'PATO', certa: 'P', cat: 'ANIMAL' }, { img: '🚪', nome: 'PORTA', certa: 'P', cat: 'MORADIA' },
+                    { img: '🧀', nome: 'QUEIJO', certa: 'Q', cat: 'ALIMENTO' }, { img: '🐀', nome: 'RATO', certa: 'R', cat: 'ANIMAL' },
+                    { img: '⌚', nome: 'RELÓGIO', certa: 'R', cat: 'OBJETO' }, { img: '🐸', nome: 'SAPO', certa: 'S', cat: 'ANIMAL' },
+                    { img: '👞', nome: 'SAPATO', certa: 'S', cat: 'VESTUÁRIO' }, { img: '☀️', nome: 'SOL', certa: 'S', cat: 'NATUREZA' },
+                    { img: '🍅', nome: 'TOMATE', certa: 'T', cat: 'ALIMENTO' }, { img: '📞', nome: 'TELEFONE', certa: 'T', cat: 'COMUNICAÇÃO' },
+                    { img: '🛠️', nome: 'TRABALHO', certa: 'T', cat: 'CIDADANIA' }, { img: '🍇', nome: 'UVA', certa: 'U', cat: 'ALIMENTO' },
+                    { img: '🐻', nome: 'URSO', certa: 'U', cat: 'ANIMAL' }, { img: '🐄', nome: 'VACA', certa: 'V', cat: 'ANIMAL' },
+                    { img: '🎸', nome: 'VIOLÃO', certa: 'V', cat: 'MÚSICA' }, { img: '☕', nome: 'XÍCARA', certa: 'X', cat: 'COZINHA' },
+                    { img: '🦓', nome: 'ZEBRA', certa: 'Z', cat: 'ANIMAL' }
+                ],
+                silabas: [
+                    { consoante: 'B', vogal: 'A', palavra: 'BANANA', icone: '🍌' }, { consoante: 'M', vogal: 'A', palavra: 'MALA', icone: '🧳' },
+                    { consoante: 'C', vogal: 'O', palavra: 'COPO', icone: '🥛' }, { consoante: 'D', vogal: 'I', palavra: 'DINHEIRO', icone: '💵' },
+                    { consoante: 'F', vogal: 'O', palavra: 'FOGO', icone: '🔥' }, { consoante: 'C', vogal: 'A', palavra: 'CASA', icone: '🏠' }
+                ],
+                palavrasJogo: [
+                    { p: 'CARTAGO', s: ['CAR','TA','GO'] }, { p: 'BRASIL', s: ['BRA','SIL'] }, { p: 'ESCOLA', s: ['ES','CO','LA'] },
+                    { p: 'BONECA', s: ['BO','NE','CA'] }, { p: 'BULE', s: ['BU','LE'] }, { p: 'CASA', s: ['CA','SA'] },
+                    { p: 'BOLA', s: ['BO','LA'] }, { p: 'MACACO', s: ['MA','CA','CO'] }, { p: 'PANELA', s: ['PA','NE','LA'] },
+                    { p: 'TOMATE', s: ['TO','MA','TE'] }, { p: 'CAVALO', s: ['CA','VA','LO'] }, { p: 'ABACATE', s: ['A','BA','CA','TE'] },
+                    { p: 'BANANA', s: ['BA','NA','NA'] }, { p: 'GATO', s: ['GA','TO'] }, { p: 'PATO', s: ['PA','TO'] },
+                    { p: 'COMPUTADOR', s: ['COM','PU','TA','DOR'] }, { p: 'TELEFONE', s: ['TE','LE','FO','NE'] },
+                    { p: 'SAPO', s: ['SA','PO'] }, { p: 'RATO', s: ['RA','TO'] }, { p: 'MATO', s: ['MA','TO'] },
+                    { p: 'LATA', s: ['LA','TA'] }, { p: 'FADA', s: ['FA','DA'] }, { p: 'MALA', s: ['MA','LA'] },
+                    { p: 'BOCA', s: ['BO','CA'] }, { p: 'DADO', s: ['DA','DO'] }, { p: 'FOCA', s: ['FO','CA'] },
+                    { p: 'LEÃO', s: ['LE','ÃO'] }, { p: 'MÃO', s: ['MÃO'] }, { p: 'PÃO', s: ['PÃO'] },
+                    { p: 'CÃO', s: ['CÃO'] }, { p: 'PEIXE', s: ['PEI','XE'] }, { p: 'LIXO', s: ['LI','XO'] },
+                    { p: 'RODA', s: ['RO','DA'] }, { p: 'FOTO', s: ['FO','TO'] }, { p: 'LOBO', s: ['LO','BO'] },
+                    { p: 'BOLO', s: ['BO','LO'] }, { p: 'SELO', s: ['SE','LO'] }, { p: 'GELO', s: ['GE','LO'] },
+                    { p: 'MESA', s: ['ME','SA'] }, { p: 'PESO', s: ['PE','SO'] }, { p: 'VASO', s: ['VA','SO'] },
+                    { p: 'SOPA', s: ['SO','PA'] }, { p: 'MAPA', s: ['MA','PA'] }, { p: 'CAPA', s: ['CA','PA'] },
+                    { p: 'LUVA', s: ['LU','VA'] }, { p: 'UVA', s: ['U','VA'] }, { p: 'OVO', s: ['O','VO'] },
+                    { p: 'AVE', s: ['A','VE'] }, { p: 'NAVE', s: ['NA','VE'] }, { p: 'NEVE', s: ['NE','VE'] },
+                    { p: 'VACA', s: ['VA','CA'] }, { p: 'FACA', s: ['FA','CA'] }, { p: 'MACA', s: ['MA','CA'] },
+                    { p: 'TELA', s: ['TE','LA'] }, { p: 'VELA', s: ['VE','LA'] }, { p: 'BELO', s: ['BE','LO'] },
+                    { p: 'BARCO', s: ['BAR','CO'] }, { p: 'MARCO', s: ['MAR','CO'] }, { p: 'PORCO', s: ['POR','CO'] }
+                ],
+                cores: [
+                    { n: 'AZUL', c: '#2196F3', txt: '#FFF' }, { n: 'VERMELHO', c: '#FF3B30', txt: '#FFF' },
+                    { n: 'AMARELO', c: '#FFCC00', txt: '#000' }, { n: 'VERDE', c: '#34C759', txt: '#FFF' },
+                    { n: 'LARANJA', c: '#FF9500', txt: '#FFF' }, { n: 'ROXO', c: '#9B59B6', txt: '#FFF' },
+                    { n: 'MARROM', c: '#A2845E', txt: '#FFF' }, { n: 'PRETO', c: '#1C1C1E', txt: '#FFF' },
+                    { n: 'BRANCO', c: '#FFFFFF', txt: '#000' }, { n: 'ROSA', c: '#FF2D55', txt: '#FFF' },
+                    { n: 'CINZA', c: '#8E8E93', txt: '#FFF' }, { n: 'AZUL CLARO', c: '#5AC8FA', txt: '#000' },
+                    { n: 'VERDE ESCURO', c: '#248A3D', txt: '#FFF' }, { n: 'BEGE', c: '#E1C699', txt: '#000' },
+                    { n: 'LILÁS', c: '#DAB4E5', txt: '#000' }, { n: 'OURO', c: '#FFD700', txt: '#000' },
+                    { n: 'PRATA', c: '#C0C0C0', txt: '#000' }, { n: 'CIANO', c: '#00BCD4', txt: '#000' }
+                ],
+                vidaPratica: [
+                    { titulo: 'RECEITA MÉDICA', cat: 'geral', icone: '💊', textoFala: 'Atenção: Tomar um comprimido de dipirona a cada 8 horas.' },
+                    { titulo: 'LETREIRO DE ÔNIBUS', cat: 'geral', icone: '🚌', textoFala: 'Expresso: Linha Centro via Terminal Rodoviário.' },
+                    { titulo: 'LISTA DO MERCADO', cat: 'geral', icone: '🛒', textoFala: 'Lista de compras: 5 quilos de arroz, feijão e macarrão.' },
+                    { titulo: 'TREINO DA ACADEMIA', cat: 'geral', icone: '🏋️', textoFala: 'Ficha de treino: Fazer 3 séries de 10 repetições.' },
+                    { titulo: 'PLACA DE SEGURANÇA (EPI)', cat: 'trabalho', icone: '🪖', textoFala: 'Aviso de segurança: Obrigatório o uso de capacete e óculos de proteção na área industrial.' },
+                    { titulo: 'AVISO DE MÁXIMA ATENÇÃO', cat: 'trabalho', icone: '⚠️', textoFala: 'Cuidado: Risco de choque elétrico. Não toque no painel sem autorização técnica.' },
+                    { titulo: 'CONTROLE DE PONTO', cat: 'trabalho', icone: '⏱️', textoFala: 'Registre seu horário de entrada e saída no terminal biométrico diariamente.' },
+                    { titulo: 'MANUAL DE INSUMOS', cat: 'trabalho', icone: '📦', textoFala: 'Armazenar em local seco e ventilado, longe da incidência solar direta.' }
+                ],
+                animais: [
+                    { nome: 'CACHORRO', cat: 'ANIMAL DOMÉSTICO' }, { nome: 'GATO', cat: 'ANIMAL DOMÉSTICO' },
+                    { nome: 'VACA', cat: 'ANIMAL DO CAMPO' }, { nome: 'CAVALO', cat: 'ANIMAL DO CAMPO' },
+                    { nome: 'PORCO', cat: 'ANIMAL DO CAMPO' }, { nome: 'GALINHA', cat: 'AVE DOMÉSTICA' },
+                    { nome: 'PATO', cat: 'AVE AQUÁTICA' }, { nome: 'OVELHA', cat: 'ANIMAL DO CAMPO' },
+                    { nome: 'LEÃO', cat: 'VIDA SILVESTRE' }, { nome: 'ELEFANTE', cat: 'VIDA SILVESTRE' },
+                    { nome: 'MACACO', cat: 'VIDA SILVESTRE' }, { nome: 'URSO', cat: 'VIDA SILVESTRE' },
+                    { nome: 'SAPO', cat: 'ANFÍBIO' }, { nome: 'PEIXE', cat: 'VIDA AQUÁTICA' },
+                    { nome: 'PAPAGAIO', cat: 'AVE BRASILEIRA' }, { nome: 'COBRA', cat: 'RÉPTIL' },
+                    { nome: 'TARTARUGA', cat: 'RÉPTIL' }, { nome: 'COELHO', cat: 'MAMÍFERO' },
+                    { nome: 'ABELHA', cat: 'INSETO' }, { nome: 'BORBOLETA', cat: 'INSETO' }
+                ],
+                alunosProfessor: [
+                    {
+                        nome: 'José Carlos da Silva',
+                        idade: 58,
+                        perfilEtario: 'Pessoa Adulta',
+                        serie: 'EJA - Fase I (2º Segmento)',
+                        tarefas: '14 tarefas no dia',
+                        pct: 92,
+                        corBarra: 'fill-verde',
+                        categoria: 'otimo',
+                        relatorio: 'Concluiu tarefas de Sons das Letras, Sílabas e Leitura Prática com 100% de aproveitamento.',
+                        orientacao: 'Avançar para leitura de frases completas',
+                        historico: [
+                            'Realizou 14 exercícios hoje nos módulos 1, 5, 6 e 10.',
+                            'Reconheceu todas as famílias silábicas e leu avisos de segurança no trabalho.',
+                            'Apresenta autonomia plena no uso do dispositivo.'
+                        ]
+                    },
+                    {
+                        nome: 'Maria Aparecida Oliveira',
+                        idade: 64,
+                        perfilEtario: 'Pessoa Adulta +',
+                        serie: 'EJA - Fase I (1º Segmento)',
+                        tarefas: '6 tarefas no dia',
+                        pct: 48,
+                        corBarra: 'fill-amarelo',
+                        categoria: 'dificuldade',
+                        relatorio: 'Apresentou dificuldade na tarefa de Formar Palavras (trocou sílabas das letras F e V).',
+                        orientacao: 'Reforçar Módulo 4 (Unindo Sons)',
+                        historico: [
+                            'Realizou 6 tarefas hoje nos módulos 3 e 6.',
+                            'Necessita de apoio na diferenciação entre os fonemas de Faca e Vaca.',
+                            'Concluiu corretamente o módulo de escrita do próprio nome.'
+                        ]
+                    },
+                    {
+                        nome: 'Antônio Ferreira Santos',
+                        idade: 71,
+                        perfilEtario: 'Pessoa Adulta +',
+                        serie: 'EJA - Etapa Inicial (Alfabetização)',
+                        tarefas: '2 tarefas no dia',
+                        pct: 25,
+                        corBarra: 'fill-vermelho',
+                        categoria: 'plataforma',
+                        relatorio: 'Dificuldade de manuseio da plataforma; necessita de orientação para alternar entre os módulos.',
+                        orientacao: 'Orientar navegação + Alto Contraste',
+                        historico: [
+                            'Realizou 2 tarefas no Módulo 1 (Sons das Letras).',
+                            'Apresentou dificuldade no toque e rolagem da tela.',
+                            'Recomendação: Habilitar o modo de Alto Contraste e fonte ampliada (A+) com acompanhamento inicial.'
+                        ]
+                    },
+                    {
+                        nome: 'Sebastiana Rodrigues',
+                        idade: 52,
+                        perfilEtario: 'Pessoa Adulta',
+                        serie: 'EJA - Fase II (2º Segmento)',
+                        tarefas: '12 tarefas no dia',
+                        pct: 88,
+                        corBarra: 'fill-verde',
+                        categoria: 'otimo',
+                        relatorio: 'Excelente desempenho em Números de 1 a 100, Cores e Vocabulário.',
+                        orientacao: 'Estudante em ritmo avançado',
+                        historico: [
+                            'Concluiu 12 tarefas hoje.',
+                            'Realizou o traçado geométrico das letras A, B, C, D e E com alta precisão.',
+                            'Ótima adaptação tanto em computador quanto em dispositivos móveis.'
+                        ]
+                    },
+                    {
+                        nome: 'Lucas Gabriel Almeida',
+                        idade: 19,
+                        perfilEtario: 'Jovem',
+                        serie: 'EJA - Fase I (1º Segmento)',
+                        tarefas: '9 tarefas no dia',
+                        pct: 76,
+                        corBarra: 'fill-verde',
+                        categoria: 'otimo',
+                        relatorio: 'Domínio rápido da interface digital; bom progresso na formação de sílabas e palavras.',
+                        orientacao: 'Praticar caligrafia e leitura prática',
+                        historico: [
+                            'Realizou 9 tarefas nos módulos 4, 5 e 6.',
+                            'Utilizou o construtor deslizante de sílabas com agilidade.',
+                            'Pronto para iniciar exercícios de interpretação de textos cotidianos.'
+                        ]
+                    },
+                    {
+                        nome: 'Francisco Chagas Lima',
+                        idade: 67,
+                        perfilEtario: 'Pessoa Adulta +',
+                        serie: 'EJA - Etapa Inicial (Alfabetização)',
+                        tarefas: '5 tarefas no dia',
+                        pct: 42,
+                        corBarra: 'fill-amarelo',
+                        categoria: 'dificuldade',
+                        relatorio: 'Dificuldade na identificação de Som Inicial e no contorno completo das letras R e S.',
+                        orientacao: 'Reforçar Módulo 3 e Módulo 7',
+                        historico: [
+                            'Realizou 5 tarefas no dia.',
+                            'Interrompeu o traçado da letra S antes de completar a base inferior.',
+                            'Indicado revisar os vídeos demonstrativos das docentes para as letras C, R e S.'
+                        ]
+                    }
+                ]
+            };
+
+            var Voz = {
+                synth: window.speechSynthesis || null,
+                falar: function (texto) {
+                    if (!this.synth) return;
+                    try {
+                        this.synth.cancel();
+                        var declaracao = new SpeechSynthesisUtterance(String(texto));
+                        declaracao.lang = 'pt-BR';
+                        declaracao.rate = 0.92;
+                        this.synth.speak(declaracao);
+                    } catch (e) {}
+                },
+                falarVogal: function (vogal) {
+                    var som = MapaFoneticoVogais[vogal] || vogal.toLowerCase();
+                    this.falar(som);
+                },
+                falarConsoante: function (consoante) {
+                    var som = MapaFoneticoConsoantes[consoante] || consoante.toLowerCase();
+                    this.falar(som);
+                },
+                falarSilaba: function (silaba) {
+                    var chave = String(silaba).toUpperCase().trim();
+                    var som = MapaFoneticoSilabas[chave] || chave.toLowerCase();
+                    this.falar(som);
+                },
+                parar: function () {
+                    if (this.synth) {
+                        try { this.synth.cancel(); } catch (e) {}
+                    }
+                }
+            };
+
+            var ReconhecimentoVoz = {
+                ouvirAlunoInicial: function () {
+                    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    var statusEl = document.getElementById('status-reconhecimento');
+                    var btnMic = document.getElementById('btn-mic-inicial');
+
+                    if (!SpeechRecognition) {
+                        alert('Navegador não suporta reconhecimento de voz.');
+                        return;
+                    }
+
+                    var recognition = new SpeechRecognition();
+                    recognition.lang = 'pt-BR';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 1;
+
+                    recognition.onstart = function () {
+                        if (statusEl) statusEl.innerText = 'OUVINDO SUA VOZ... FALE AGORA!';
+                        if (btnMic) btnMic.classList.add('ouvindo');
+                        Voz.falar('Pode falar.');
+                    };
+
+                    recognition.onresult = function (event) {
+                        var dito = event.results[0][0].transcript.trim().toUpperCase();
+                        if (statusEl) statusEl.innerText = 'VOCÊ DISSE: "' + dito + '"';
+                        
+                        var item = BancoDados.iniciais[InteracaoApp.idInicialAtual || 0];
+                        if (item && (dito.includes(item.nome) || dito.startsWith(item.certa))) {
+                            Voz.falar('Correto! Você pronunciou ' + item.nome + ' perfeitamente.');
+                            InteracaoApp.gerarConfetes();
+                            GerenciadorPerfil.registrarAcaoAluno('Pronunciou corretamente no microfone: ' + item.nome);
+                            setTimeout(function () { InteracaoApp.sortearNovaInicial(); }, 2200);
+                        } else {
+                            Voz.falar('Você disse ' + dito + '. Tente pronunciar novamente.');
+                            GerenciadorPerfil.registrarDificuldadeAluno('Dificuldade de pronúncia no microfone (' + dito + ').');
+                        }
+                    };
+
+                    recognition.onerror = function () {
+                        if (statusEl) statusEl.innerText = 'NÃO FOI POSSÍVEL OUVIR. TENTE NOVAMENTE.';
+                    };
+
+                    recognition.onend = function () {
+                        if (btnMic) btnMic.classList.remove('ouvindo');
+                    };
+
+                    recognition.start();
+                },
+
+                ouvirPalavraCompleta: function () {
+                    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    var statusEl = document.getElementById('status-rec-palavra');
+
+                    if (!SpeechRecognition) {
+                        alert('Reconhecimento de voz indisponível.');
+                        return;
+                    }
+
+                    var recognition = new SpeechRecognition();
+                    recognition.lang = 'pt-BR';
+                    recognition.interimResults = false;
+
+                    recognition.onstart = function () {
+                        if (statusEl) statusEl.innerText = 'OUVINDO PALAVRA...';
+                        Voz.falar('Fale a palavra.');
+                    };
+
+                    recognition.onresult = function (event) {
+                        var dito = event.results[0][0].transcript.trim().toUpperCase();
+                        if (statusEl) statusEl.innerText = 'VOCÊ FALOU: "' + dito + '"';
+                        var palavraAlvo = document.getElementById('dica-palavra').innerText.trim().toUpperCase();
+
+                        if (dito.includes(palavraAlvo)) {
+                            Voz.falar('Parabéns! Leitura por voz validada.');
+                            InteracaoApp.gerarConfetes();
+                            GerenciadorPerfil.registrarAcaoAluno('Leu por voz a palavra ' + palavraAlvo);
+                            setTimeout(function () { InteracaoApp.proximaPalavra(); }, 2200);
+                        } else {
+                            Voz.falar('Você disse ' + dito + '. Tente novamente.');
+                        }
+                    };
+
+                    recognition.onend = function () {
+                        if (statusEl) statusEl.innerText = 'AGUARDANDO SUA VOZ...';
+                    };
+
+                    recognition.start();
+                }
+            };
+
+            var AppConfig = {
+                tamanhoAtual: 100,
+                alterarTamanhoFonte: function (inc) {
+                    var novo = this.tamanhoAtual + inc;
+                    if (novo >= 80 && novo <= 150) {
+                        this.tamanhoAtual = novo;
+                        document.documentElement.style.fontSize = this.tamanhoAtual + '%';
+                        var abaEscrever = document.getElementById('aba-escrever');
+                        if (QuadroInterativo && abaEscrever && abaEscrever.classList.contains('active')) {
+                            setTimeout(function () { QuadroInterativo.redimensionar(); }, 50);
+                        }
+                    }
+                },
+                alternarAltoContraste: function () {
+                    var ativo = document.body.classList.toggle('alto-contraste');
+                    var botao = document.getElementById('btn-alto-contraste');
+                    if (botao) botao.setAttribute('aria-pressed', String(ativo));
+                    if (QuadroInterativo) QuadroInterativo.atualizarCorTraco();
+                }
+            };
+
+            var GerenciadorCookies = {
+                verificar: function () {
+                    var aceito = lerStorage('phoneticface_cookies_lgpd', '');
+                    var banner = document.getElementById('banner-cookies');
+                    if (!aceito && banner) banner.style.display = 'flex';
+                },
+                aceitar: function () {
+                    salvarStorage('phoneticface_cookies_lgpd', 'aceito');
+                    this.fechar();
+                },
+                fechar: function () {
+                    var banner = document.getElementById('banner-cookies');
+                    if (banner) banner.style.display = 'none';
+                }
+            };
+
+            var InterfaceModal = {
+                mostrarVideo: function (item) {
+                    var modal = document.getElementById('modal-letras');
+                    var titulo = document.getElementById('letra-display');
+                    var texto = document.getElementById('modal-texto-palavra');
+                    var iframe = document.getElementById('player-youtube');
+                    var linkDireto = document.getElementById('link-youtube-direto');
+
+                    if (!modal) return;
+                    Voz.parar();
+
+                    if (titulo) titulo.innerText = 'LETRA ' + item.letra.toUpperCase();
+                    if (texto) texto.innerText = item.letra.toUpperCase() + ' DE ' + item.palavra.toUpperCase();
+                    if (iframe) iframe.src = 'https://www.youtube.com/embed/' + item.youtubeId + '?rel=0&autoplay=1';
+                    if (linkDireto) linkDireto.href = 'https://www.youtube.com/watch?v=' + item.youtubeId;
+
+                    modal.classList.add('visivel');
+                    GerenciadorPerfil.registrarAcaoAluno('Assistiu ao vídeo da docente para a letra ' + item.letra + ' (' + item.palavra + ').');
+                },
+                fechar: function () {
+                    var modal = document.getElementById('modal-letras');
+                    var iframe = document.getElementById('player-youtube');
+                    if (modal) modal.classList.remove('visivel');
+                    Voz.parar();
+                    if (iframe) iframe.src = '';
+                }
+            };
+
+            var ConstrutorSilabas = {
+                consoantes: ['B', 'C', 'D', 'F', 'G', 'J', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'V', 'X', 'Z'],
+                vogais: ['A', 'E', 'I', 'O', 'U'],
+                idxConsoante: 0,
+                idxVogal: 0,
+
+                inicializar: function () {
+                    this.atualizarVisor(false);
+                    this.embaralharLetrasMisturadas();
+                    this.configurarArrasteRoleta('roleta-consoante', true);
+                    this.configurarArrasteRoleta('roleta-vogal', false);
+                },
+
+                mudarConsoante: function (direcao) {
+                    var total = this.consoantes.length;
+                    this.idxConsoante = (this.idxConsoante + direcao + total) % total;
+                    this.atualizarVisor(true);
+                },
+
+                mudarVogal: function (direcao) {
+                    var total = this.vogais.length;
+                    this.idxVogal = (this.idxVogal + direcao + total) % total;
+                    this.atualizarVisor(true);
+                },
+
+                selecionarLetraMisturada: function (letra) {
+                    var idxV = this.vogais.indexOf(letra);
+                    if (idxV !== -1) {
+                        this.idxVogal = idxV;
+                    } else {
+                        var idxC = this.consoantes.indexOf(letra);
+                        if (idxC !== -1) this.idxConsoante = idxC;
+                    }
+                    this.atualizarVisor(true);
+                },
+
+                atualizarVisor: function (falarAutomaticamente) {
+                    var c = this.consoantes[this.idxConsoante];
+                    var v = this.vogais[this.idxVogal];
+                    var silaba = c + v;
+                    var palavra = ExemplosSilabas[silaba] || 'PALAVRA';
+
+                    var elC = document.getElementById('visor-consoante-ativa');
+                    var elV = document.getElementById('visor-vogal-ativa');
+                    var elSil = document.getElementById('texto-silaba-formada');
+                    var elPal = document.getElementById('texto-palavra-silaba');
+
+                    if (elC) elC.innerText = c;
+                    if (elV) elV.innerText = v;
+                    if (elSil) elSil.innerText = silaba;
+                    if (elPal) elPal.innerText = silaba + ' DE ' + palavra;
+
+                    if (falarAutomaticamente) {
+                        this.falarResultadoAtual();
+                    }
+                },
+
+                falarResultadoAtual: function () {
+                    var c = this.consoantes[this.idxConsoante];
+                    var v = this.vogais[this.idxVogal];
+                    var silaba = c + v;
+                    var palavra = ExemplosSilabas[silaba] || '';
+                    Voz.falarSilaba(silaba);
+                    if (palavra) {
+                        setTimeout(function () { Voz.falar('de ' + palavra.toLowerCase()); }, 600);
+                    }
+                    GerenciadorPerfil.registrarAcaoAluno('Formou a sílaba ' + silaba + ' (' + silaba + ' de ' + palavra + ').');
+                },
+
+                embaralharLetrasMisturadas: function () {
+                    var container = document.getElementById('painel-letras-misturadas');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    var todas = embaralharArray(this.consoantes.concat(this.vogais));
+                    var self = this;
+
+                    todas.forEach(function (letra) {
+                        var ehVogal = self.vogais.indexOf(letra) !== -1;
+                        var btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'btn-letra-misturada' + (ehVogal ? ' vogal-mista' : '');
+                        btn.innerText = letra;
+                        btn.onclick = function () { self.selecionarLetraMisturada(letra); };
+                        container.appendChild(btn);
+                    });
+                },
+
+                configurarArrasteRoleta: function (idElemento, ehConsoante) {
+                    var el = document.getElementById(idElemento);
+                    if (!el) return;
+                    var inicioY = null;
+                    var self = this;
+
+                    el.addEventListener('touchstart', function (e) {
+                        if (e.touches && e.touches.length > 0) inicioY = e.touches[0].clientY;
+                    }, { passive: true });
+
+                    el.addEventListener('touchend', function (e) {
+                        if (inicioY === null || !e.changedTouches || e.changedTouches.length === 0) return;
+                        var deltaY = e.changedTouches[0].clientY - inicioY;
+                        if (Math.abs(deltaY) > 22) {
+                            var direcao = deltaY > 0 ? -1 : 1;
+                            if (ehConsoante) self.mudarConsoante(direcao);
+                            else self.mudarVogal(direcao);
+                        }
+                        inicioY = null;
+                    }, { passive: true });
+
+                    el.addEventListener('wheel', function (e) {
+                        e.preventDefault();
+                        var direcao = e.deltaY > 0 ? 1 : -1;
+                        if (ehConsoante) self.mudarConsoante(direcao);
+                        else self.mudarVogal(direcao);
+                    }, { passive: false });
+                }
+            };
+
+            function CanvasCaligrafia(idCanvas, idContainer, idGuia) {
+                this.canvas = document.getElementById(idCanvas);
+                this.container = document.getElementById(idContainer);
+                this.guiaFundo = document.getElementById(idGuia);
+                this.barraStatus = document.getElementById('aviso-tracado');
+                if (!this.canvas || !this.container) return;
+
+                this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+                this.canvasMolde = document.createElement('canvas');
+                this.ctxMolde = this.canvasMolde.getContext('2d', { willReadFrequently: true });
+
+                this.letraAtual = 'A';
+                this.desenhando = false;
+                this.timerValidacao = null;
+                this.vincularEventos();
+            }
+
+            CanvasCaligrafia.prototype.atualizarCorTraco = function () {
+                if (!this.ctx) return;
+                this.ctx.strokeStyle = document.body.classList.contains('alto-contraste') ? '#FFFF00' : '#0056B3';
+            };
+
+            CanvasCaligrafia.prototype.redimensionar = function () {
+                if (!this.container || !this.canvas || !this.ctx) return;
+                var largura = this.container.clientWidth || 600;
+                var altura = this.container.clientHeight || 420;
+
+                var anterior = document.createElement('canvas');
+                anterior.width = this.canvas.width;
+                anterior.height = this.canvas.height;
+                if (anterior.width > 0 && anterior.height > 0) {
+                    anterior.getContext('2d').drawImage(this.canvas, 0, 0);
+                }
+
+                this.canvas.width = largura;
+                this.canvas.height = altura;
+                this.ctx.lineWidth = 26;
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                this.atualizarCorTraco();
+                this.desenharMoldeLetra();
+
+                if (anterior.width > 0 && anterior.height > 0) {
+                    this.ctx.drawImage(anterior, 0, 0, anterior.width, anterior.height, 0, 0, largura, altura);
+                }
+            };
+
+            CanvasCaligrafia.prototype.desenharMoldeLetra = function () {
+                if (!this.canvas) return;
+                var w = this.canvas.width;
+                var h = this.canvas.height;
+                if (!w || !h) return;
+
+                this.canvasMolde.width = w;
+                this.canvasMolde.height = h;
+                this.ctxMolde.clearRect(0, 0, w, h);
+
+                var tamFonte = w < 500 ? 180 : 240;
+                if (this.guiaFundo) this.guiaFundo.style.fontSize = tamFonte + 'px';
+
+                this.ctxMolde.font = '900 ' + tamFonte + 'px Arial, Helvetica, sans-serif';
+                this.ctxMolde.textAlign = 'center';
+                this.ctxMolde.textBaseline = 'middle';
+                this.ctxMolde.lineWidth = 42;
+                this.ctxMolde.lineJoin = 'round';
+                this.ctxMolde.strokeStyle = '#000';
+                this.ctxMolde.fillStyle = '#000';
+                this.ctxMolde.strokeText(this.letraAtual, w / 2, h / 2);
+                this.ctxMolde.fillText(this.letraAtual, w / 2, h / 2);
+            };
+
+            CanvasCaligrafia.prototype.obterCoordenadas = function (e) {
+                var rect = this.canvas.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+                }
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            };
+
+            CanvasCaligrafia.prototype.iniciarTraco = function (e) {
+                clearTimeout(this.timerValidacao);
+                this.desenhando = true;
+                this.atualizarCorTraco();
+                e.preventDefault();
+                var pos = this.obterCoordenadas(e);
+                this.ctx.beginPath();
+                this.ctx.moveTo(pos.x, pos.y);
+            };
+
+            CanvasCaligrafia.prototype.desenhar = function (e) {
+                if (!this.desenhando) return;
+                e.preventDefault();
+                var pos = this.obterCoordenadas(e);
+                this.ctx.lineTo(pos.x, pos.y);
+                this.ctx.stroke();
+                this.ctx.beginPath();
+                this.ctx.moveTo(pos.x, pos.y);
+            };
+
+            CanvasCaligrafia.prototype.finalizarTraco = function () {
+                if (!this.desenhando) return;
+                this.desenhando = false;
+                this.ctx.beginPath();
+                var self = this;
+                this.timerValidacao = setTimeout(function () { self.validarDesenho(); }, 1100);
+            };
+
+            CanvasCaligrafia.prototype.atualizarAviso = function (texto, classe) {
+                if (!this.barraStatus) return;
+                this.barraStatus.innerText = texto;
+                this.barraStatus.className = 'barra-status-tracado ' + (classe || '');
+            };
+
+            CanvasCaligrafia.prototype.validarDesenho = function () {
+                if (!this.canvas) return;
+                var w = this.canvas.width;
+                var h = this.canvas.height;
+                if (!w || !h) return;
+
+                this.desenharMoldeLetra();
+                var dadosAluno = this.ctx.getImageData(0, 0, w, h).data;
+                var dadosMolde = this.ctxMolde.getImageData(0, 0, w, h).data;
+
+                var pintadosPeloAluno = 0;
+                var pintadosDentroDaLetra = 0;
+                var tamanhoMolde = 0;
+
+                for (var i = 3; i < dadosAluno.length; i += 16) {
+                    var alunoRiscou = dadosAluno[i] > 50;
+                    var dentroDaLetra = dadosMolde[i] > 50;
+
+                    if (dentroDaLetra) tamanhoMolde++;
+                    if (alunoRiscou) {
+                        pintadosPeloAluno++;
+                        if (dentroDaLetra) pintadosDentroDaLetra++;
+                    }
+                }
+
+                if (pintadosPeloAluno === 0) return;
+
+                var precisao = pintadosDentroDaLetra / pintadosPeloAluno;
+                var preenchimento = tamanhoMolde > 0 ? (pintadosDentroDaLetra / tamanhoMolde) : 0;
+                var self = this;
+
+                if (precisao < 0.50 || preenchimento < 0.14 || pintadosPeloAluno > tamanhoMolde * 1.5) {
+                    this.atualizarAviso('❌ ERROU, TENTE NOVAMENTE! CONTORNE EM CIMA DA LETRA ' + this.letraAtual + '.', 'erro');
+                    Voz.falar('ERROU, TENTE NOVAMENTE.');
+                    GerenciadorPerfil.registrarDificuldadeAluno('Errou o traçado da letra ' + this.letraAtual + '.');
+                    setTimeout(function () { self.limparSilencioso(); }, 950);
+                } else {
+                    this.atualizarAviso('✅ MUITO BEM! TRAÇADO DA LETRA ' + this.letraAtual + ' CORRETO!', 'sucesso');
+                    Voz.falar('TÁ CERTO! PARABÉNS PELO DESENHO.');
+                    InteracaoApp.gerarConfetes();
+                    GerenciadorPerfil.registrarAcaoAluno('Concluiu corretamente o traçado da letra ' + this.letraAtual + '.');
+                    setTimeout(function () {
+                        self.limparSilencioso();
+                        self.atualizarAviso('PASSE O DEDO OU O MOUSE EXATAMENTE EM CIMA DA LETRA ' + self.letraAtual, '');
+                    }, 2400);
+                }
+            };
+
+            CanvasCaligrafia.prototype.limparSilencioso = function () {
+                if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            };
+
+            CanvasCaligrafia.prototype.limpar = function () {
+                this.limparSilencioso();
+                this.atualizarAviso('QUADRO APAGADO. CONTORNE A LETRA ' + this.letraAtual, '');
+                Voz.falar('QUADRO APAGADO.');
+            };
+
+            CanvasCaligrafia.prototype.definirGuia = function (letra, btnClicado) {
+                this.letraAtual = letra;
+                if (this.guiaFundo) this.guiaFundo.innerText = letra;
+                if (btnClicado) {
+                    var bts = document.querySelectorAll('#botoes-desenho .btn-ferramenta');
+                    for (var i = 0; i < bts.length; i++) bts[i].classList.remove('letra-ativa');
+                    btnClicado.classList.add('letra-ativa');
+                }
+                this.limparSilencioso();
+                this.desenharMoldeLetra();
+                this.atualizarAviso('PASSE O DEDO OU O MOUSE EXATAMENTE EM CIMA DA LETRA ' + letra, '');
+                var textoFalar = (letra === '?' || letra === '~' || letra === '-') ? 'DESENHE O SINAL ' + letra : 'CONTORNE O TRAÇADO DA LETRA ' + letra;
+                Voz.falar(textoFalar);
+            };
+
+            CanvasCaligrafia.prototype.vincularEventos = function () {
+                var self = this;
+                this.canvas.addEventListener('mousedown', function (e) { self.iniciarTraco(e); });
+                this.canvas.addEventListener('mousemove', function (e) { self.desenhar(e); });
+                this.canvas.addEventListener('mouseup', function () { self.finalizarTraco(); });
+                this.canvas.addEventListener('touchstart', function (e) { self.iniciarTraco(e); }, { passive: false });
+                this.canvas.addEventListener('touchmove', function (e) { self.desenhar(e); }, { passive: false });
+                this.canvas.addEventListener('touchend', function () { self.finalizarTraco(); });
+            };
+
+            var QuadroInterativo = null;
+
+            var InteracaoApp = {
+                idInicial: 0,
+                idPalavra: 0,
+                palavraAtual: null,
+                silabasPreenchidas: 0,
+
+                verificarNome: function () {
+                    var input = document.getElementById('input-nome');
+                    if (!input) return;
+                    var nome = input.value.trim().toUpperCase();
+                    if (nome.length > 0) {
+                        salvarStorage('phoneticface_aluno', nome);
+                        var boasVindas = document.getElementById('mensagem-boas-vindas');
+                        if (boasVindas) {
+                            boasVindas.innerText = 'ESTUDANTE: ' + nome;
+                            boasVindas.style.display = 'block';
+                        }
+                        Voz.falar('Muito bem, ' + nome + '! Seu nome foi confirmado.');
+                        this.gerarConfetes();
+                        GerenciadorPerfil.registrarAcaoAluno('Cadastrou e treinou a escrita do nome (' + nome + ').');
+                    } else {
+                        Voz.falar('Por favor, digite o seu nome na caixa branca.');
+                    }
+                },
+
+                carregarNomeSalvo: function () {
+                    var nomeSalvo = lerStorage('phoneticface_aluno', '');
+                    if (nomeSalvo) {
+                        var boasVindas = document.getElementById('mensagem-boas-vindas');
+                        var input = document.getElementById('input-nome');
+                        if (boasVindas) {
+                            boasVindas.innerText = 'ESTUDANTE: ' + nomeSalvo;
+                            boasVindas.style.display = 'block';
+                        }
+                        if (input) input.value = nomeSalvo;
+                    }
+                },
+
+                gerarConfetes: function () {
+                    var cores = ['#FF3B30', '#00BCD4', '#34C759', '#FFCC00', '#9B59B6'];
+                    for (var i = 0; i < 55; i++) {
+                        (function () {
+                            var confete = document.createElement('div');
+                            confete.className = 'confete';
+                            confete.style.left = Math.random() * 100 + 'vw';
+                            confete.style.top = '-10px';
+                            confete.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+                            confete.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                            document.body.appendChild(confete);
+                            setTimeout(function () { confete.remove(); }, 4000);
+                        })();
+                    }
+                },
+
+                ouvirPalavraInicial: function () {
+                    var item = BancoDados.iniciais[this.idInicial];
+                    if (item) Voz.falar(item.nome);
+                },
+
+                sortearNovaInicial: function () {
+                    this.idInicial = Math.floor(Math.random() * BancoDados.iniciais.length);
+                    this.carregarInicial();
+                    this.ouvirPalavraInicial();
+                },
+
+                carregarInicial: function () {
+                    var self = this;
+                    var elCat = document.getElementById('categoria-inicial-dica');
+                    var elDica = document.getElementById('nome-inicial-dica');
+                    var ct = document.getElementById('opcoes-iniciais');
+                    if (!elDica || !ct) return;
+
+                    var item = BancoDados.iniciais[this.idInicial];
+                    if (elCat) elCat.innerText = 'TEMA: ' + item.cat;
+                    elDica.innerText = '_ ' + item.nome.substring(1).split('').join(' ');
+                    ct.innerHTML = '';
+
+                    var todasLetras = BancoDados.vogais.concat(BancoDados.consoantes);
+                    var outras = todasLetras.filter(function (l) { return l !== item.certa; });
+                    var sorteadas = embaralharArray(outras).slice(0, 3);
+                    sorteadas.push(item.certa);
+                    var opcoes = embaralharArray(sorteadas);
+
+                    opcoes.forEach(function (op) {
+                        var b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'btn-grande';
+                        b.style.backgroundColor = 'var(--cor-primaria)';
+                        b.innerText = op;
+                        b.onclick = function () {
+                            if (op === item.certa) {
+                                elDica.innerText = item.nome.split('').join(' ');
+                                Voz.falar('Muito bem! ' + item.nome + ' começa com a letra ' + item.certa + '.');
+                                self.gerarConfetes();
+                                GerenciadorPerfil.registrarAcaoAluno('Identificou a letra inicial da palavra ' + item.nome + '.');
+                                self.idInicial = (self.idInicial + 1) % BancoDados.iniciais.length;
+                                setTimeout(function () { self.carregarInicial(); }, 2500);
+                            } else {
+                                Voz.falar('Errou, tente novamente.');
+                                GerenciadorPerfil.registrarDificuldadeAluno('Dificuldade na letra inicial de ' + item.nome + '.');
+                            }
+                        };
+                        ct.appendChild(b);
+                    });
+                },
+
+                carregarPalavra: function () {
+                    var self = this;
+                    var elDica = document.getElementById('dica-palavra');
+                    var slots = document.getElementById('slots-palavra');
+                    var soltas = document.getElementById('silabas-soltas');
+                    if (!elDica || !slots || !soltas) return;
+
+                    this.palavraAtual = BancoDados.palavrasJogo[this.idPalavra];
+                    this.silabasPreenchidas = 0;
+                    elDica.innerText = this.palavraAtual.p;
+                    slots.innerHTML = '';
+                    soltas.innerHTML = '';
+
+                    this.palavraAtual.s.forEach(function (_, i) {
+                        var slot = document.createElement('div');
+                        slot.className = 'slot-silaba';
+                        slot.id = 'slot-' + i;
+                        slots.appendChild(slot);
+                    });
+
+                    var embaralhadas = embaralharArray(this.palavraAtual.s);
+                    embaralhadas.forEach(function (silaba) {
+                        var b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'btn-grande';
+                        b.style.backgroundColor = 'var(--cor-primaria)';
+                        b.innerText = silaba;
+                        b.onclick = function (e) {
+                            var silabaCorreta = self.palavraAtual.s[self.silabasPreenchidas];
+                            if (silaba === silabaCorreta) {
+                                Voz.falarSilaba(silaba);
+                                var sl = document.getElementById('slot-' + self.silabasPreenchidas);
+                                if (sl) {
+                                    sl.innerText = silaba;
+                                    sl.style.backgroundColor = 'var(--cor-sucesso)';
+                                    sl.style.color = 'white';
+                                    sl.style.borderColor = 'var(--cor-sucesso)';
+                                }
+                                e.currentTarget.style.visibility = 'hidden';
+                                self.silabasPreenchidas++;
+                                if (self.silabasPreenchidas === self.palavraAtual.s.length) {
+                                    GerenciadorPerfil.registrarAcaoAluno('Formou a palavra ' + self.palavraAtual.p + '.');
+                                    setTimeout(function () {
+                                        Voz.falar('Parabéns! Você formou a palavra ' + self.palavraAtual.p.toLowerCase() + '.');
+                                        self.gerarConfetes();
+                                    }, 700);
+                                }
+                            } else {
+                                Voz.falar('Errou, tente novamente.');
+                                GerenciadorPerfil.registrarDificuldadeAluno('Dúvida ao juntar as sílabas de ' + self.palavraAtual.p + '.');
+                            }
+                        };
+                        soltas.appendChild(b);
+                    });
+                },
+
+                proximaPalavra: function () {
+                    this.idPalavra = Math.floor(Math.random() * BancoDados.palavrasJogo.length);
+                    this.carregarPalavra();
+                }
+            };
+
+            var LeituraPraticaApp = {
+                filtroAtual: 'todos',
+                filtrar: function (tipo, btn) {
+                    this.filtroAtual = tipo;
+                    if (btn) {
+                        var botoes = document.querySelectorAll('#aba-dia-a-dia .btn-filtro');
+                        for (var i = 0; i < botoes.length; i++) botoes[i].classList.remove('active');
+                        btn.classList.add('active');
+                    }
+                    ConstrutorInterface.renderizarVidaPratica();
+                }
+            };
+
+            var GerenciadorPerfil = {
+                tarefasSessao: 4,
+                historicoSessao: [
+                    'Acessou a plataforma PhoneticFace.',
+                    'Realizou atividades de consciência fonológica.'
+                ],
+                ultimoDiagnostico: 'Participando das lições na sessão atual.',
+                fichaTextoAtual: '',
+                indiceFichaAberta: 0,
+                selecionadosImpressao: {},
+
+                registrarAcaoAluno: function (acao) {
+                    this.tarefasSessao++;
+                    this.historicoSessao.unshift(acao);
+                    if (this.historicoSessao.length > 6) this.historicoSessao.pop();
+                },
+
+                registrarDificuldadeAluno: function (erro) {
+                    this.ultimoDiagnostico = erro;
+                    this.historicoSessao.unshift('⚠️ ' + erro);
+                },
+
+                abrirModal: function () {
+                    Voz.parar();
+                    var m = document.getElementById('modal-selecao-perfil');
+                    if (m) m.classList.add('visivel');
+                },
+
+                solicitarSenhaProfessor: function () {
+                    var m = document.getElementById('modal-selecao-perfil');
+                    if (m) m.classList.remove('visivel');
+                    var senhaModal = document.getElementById('modal-senha-professor');
+                    if (senhaModal) senhaModal.classList.add('visivel');
+                },
+
+                fecharSenhaProfessor: function () {
+                    var senhaModal = document.getElementById('modal-senha-professor');
+                    if (senhaModal) senhaModal.classList.remove('visivel');
+                    this.abrirModal();
+                },
+
+                preencherSenhaDemo: function () {
+                    var input = document.getElementById('input-senha-prof');
+                    if (input) input.value = 'prof2026';
+                    this.validarSenhaProfessor();
+                },
+
+                validarSenhaProfessor: function () {
+                    var input = document.getElementById('input-senha-prof');
+                    var erroBox = document.getElementById('erro-senha-prof');
+                    var senhaDigitada = input ? input.value.trim() : '';
+
+                    if (senhaDigitada === 'prof2026' || senhaDigitada === 'admin' || senhaDigitada === '1234') {
+                        if (erroBox) erroBox.style.display = 'none';
+                        if (input) input.value = '';
+                        var senhaModal = document.getElementById('modal-senha-professor');
+                        if (senhaModal) senhaModal.classList.remove('visivel');
+                        this.selecionar('professor');
+                    } else {
+                        if (erroBox) erroBox.style.display = 'block';
+                        Voz.falar('Senha incorreta.');
+                    }
+                },
+
+                selecionar: function (perfil) {
+                    var m = document.getElementById('modal-selecao-perfil');
+                    if (m) m.classList.remove('visivel');
+
+                    var viewAluno = document.getElementById('view-aluno');
+                    var viewProf = document.getElementById('view-professor');
+                    var navAluno = document.getElementById('container-navegacao-aluno');
+                    var btnAluno = document.getElementById('btn-topo-aluno');
+                    var btnProf = document.getElementById('btn-topo-prof');
+
+                    if (perfil === 'professor') {
+                        if (viewAluno) viewAluno.style.display = 'none';
+                        if (navAluno) navAluno.style.display = 'none';
+                        if (viewProf) viewProf.style.display = 'block';
+                        if (btnAluno) btnAluno.classList.remove('ativo');
+                        if (btnProf) btnProf.classList.add('ativo');
+                        this.renderizarTabela('todos');
+                        Voz.falar('Painel do professor aberto.');
+                    } else {
+                        if (viewProf) viewProf.style.display = 'none';
+                        if (viewAluno) viewAluno.style.display = 'block';
+                        if (navAluno) navAluno.style.display = 'block';
+                        if (btnProf) btnProf.classList.remove('ativo');
+                        if (btnAluno) btnAluno.classList.add('ativo');
+                        var abaEscrever = document.getElementById('aba-escrever');
+                        if (QuadroInterativo && abaEscrever && abaEscrever.classList.contains('active')) {
+                            setTimeout(function () { QuadroInterativo.redimensionar(); }, 60);
+                        }
+                        Voz.falar('Modo aluno aberto. Bons estudos.');
+                    }
+                },
+
+                obterAlunosCombinados: function () {
+                    var nomeAtual = lerStorage('phoneticface_aluno', 'Estudante em Aula Agora');
+                    var pct = Math.min(100, 45 + (this.tarefasSessao * 8));
+                    var alunoAoVivo = {
+                        id: 100,
+                        nome: '🟢 ' + nomeAtual + ' (Sessão Atual)',
+                        idade: 32,
+                        perfilEtario: 'Pessoa Adulta',
+                        serie: 'EJA - Fase I (1º Segmento)',
+                        tarefas: this.tarefasSessao + ' tarefas no dia',
+                        pct: pct,
+                        corBarra: pct >= 70 ? 'fill-verde' : 'fill-amarelo',
+                        categoria: 'otimo',
+                        relatorio: this.ultimoDiagnostico,
+                        orientacao: 'Sessão em andamento',
+                        corBadge: 'var(--cor-primaria)',
+                        historico: this.historicoSessao
+                    };
+                    return [alunoAoVivo].concat(BancoDados.alunosProfessor);
+                },
+
+                adicionarNovoAluno: function () {
+                    var inNome = document.getElementById('novo-aluno-nome');
+                    var inIdade = document.getElementById('novo-aluno-idade');
+                    var inPerfil = document.getElementById('novo-aluno-perfil');
+                    var inSerie = document.getElementById('novo-aluno-serie');
+                    if (!inNome || !inNome.value.trim()) {
+                        Voz.falar('Informe o nome do estudante.');
+                        return;
+                    }
+                    var idadeNum = parseInt(inIdade.value, 10) || 35;
+                    var novo = {
+                        id: Date.now(),
+                        nome: inNome.value.trim(),
+                        idade: idadeNum,
+                        perfilEtario: inPerfil ? inPerfil.value : 'Pessoa Adulta',
+                        serie: inSerie ? inSerie.value : 'EJA - Fase I (1º Segmento)',
+                        tarefas: '1 tarefa no dia',
+                        pct: 50,
+                        corBarra: 'fill-amarelo',
+                        categoria: 'otimo',
+                        relatorio: 'Estudante cadastrado recentemente na turma.',
+                        orientacao: 'Iniciar avaliação fônica nos módulos iniciais',
+                        corBadge: 'var(--cor-primaria)',
+                        historico: ['Cadastro efetuado no Painel Docente.']
+                    };
+                    BancoDados.alunosProfessor.unshift(novo);
+                    inNome.value = '';
+                    if (inIdade) inIdade.value = '';
+                    this.renderizarTabela('todos');
+                    Voz.falar('Estudante cadastrado com sucesso.');
+                },
+
+                filtrarAlunos: function (categoria, btn) {
+                    if (btn) {
+                        var botoes = document.querySelectorAll('.tabela-container ~ * .btn-filtro, .cartao .btn-filtro');
+                        for (var i = 0; i < botoes.length; i++) botoes[i].classList.remove('active');
+                        btn.classList.add('active');
+                    }
+                    this.renderizarTabela(categoria);
+                },
+
+                alternarSelecaoAluno: function (indice, marcado) {
+                    this.selecionadosImpressao[indice] = marcado;
+                },
+
+                alternarSelecaoTodos: function (marcado) {
+                    var todos = this.obterAlunosCombinados();
+                    for (var i = 0; i < todos.length; i++) {
+                        this.selecionadosImpressao[i] = marcado;
+                    }
+                    var checks = document.querySelectorAll('.check-impressao-aluno');
+                    for (var j = 0; j < checks.length; j++) {
+                        checks[j].checked = marcado;
+                    }
+                },
+
+                renderizarTabela: function (categoria) {
+                    var tbody = document.getElementById('tabela-alunos-body');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+
+                    var todos = this.obterAlunosCombinados();
+                    var kpiTotal = document.getElementById('kpi-total-alunos');
+                    if (kpiTotal) kpiTotal.innerText = String(todos.length);
+
+                    var self = this;
+                    todos.forEach(function (aluno, idx) {
+                        if (categoria && categoria !== 'todos' && aluno.categoria !== categoria) return;
+                        var marcado = !!self.selecionadosImpressao[idx];
+                        var tr = document.createElement('tr');
+                        tr.innerHTML =
+                            '<td style="text-align:center;"><input type="checkbox" class="check-impressao-aluno" ' + (marcado ? 'checked' : '') + ' onchange="GerenciadorPerfil.alternarSelecaoAluno(' + idx + ', this.checked)"></td>' +
+                            '<td><strong>' + aluno.nome + '</strong></td>' +
+                            '<td>' + aluno.idade + ' anos (' + aluno.perfilEtario + ')</td>' +
+                            '<td>' + aluno.serie + '</td>' +
+                            '<td><strong>' + aluno.tarefas + '</strong></td>' +
+                            '<td><div class="barra-progresso-bg"><div class="barra-progresso-fill ' + aluno.corBarra + '" style="width:' + aluno.pct + '%;">' + aluno.pct + '%</div></div></td>' +
+                            '<td>' + aluno.relatorio + '</td>' +
+                            '<td><div class="acoes-linha-prof">' +
+                            '<button type="button" class="btn-ver-ficha" onclick="GerenciadorPerfil.abrirFicha(' + idx + ')">FICHA</button>' +
+                            '<button type="button" class="btn-imprimir-linha" onclick="GerenciadorPerfil.imprimirAlunoUnico(' + idx + ')">IMPRIMIR</button>' +
+                            '</div></td>';
+                        tbody.appendChild(tr);
+                    });
+                },
+
+                abrirFicha: function (indice) {
+                    var aluno = this.obterAlunosCombinados()[indice];
+                    if (!aluno) return;
+                    this.indiceFichaAberta = indice;
+
+                    var elNome = document.getElementById('ficha-nome-aluno');
+                    var elResumo = document.getElementById('ficha-resumo-aluno');
+                    var elCorpo = document.getElementById('ficha-corpo-detalhes');
+                    var modalFicha = document.getElementById('modal-ficha-aluno');
+
+                    if (elNome) elNome.innerText = aluno.nome;
+                    if (elResumo) elResumo.innerText = 'Idade: ' + aluno.idade + ' anos (' + aluno.perfilEtario + ') | ' + aluno.serie + ' | Evolução: ' + aluno.pct + '%';
+
+                    var listaHtml = aluno.historico.map(function (h) { return '<li style="margin-bottom:6px;">' + h + '</li>'; }).join('');
+                    if (elCorpo) {
+                        elCorpo.innerHTML =
+                            '<div class="ficha-item"><h4>Perfil Demográfico e Acadêmico</h4><p>Idade: ' + aluno.idade + ' anos — Classificação: ' + aluno.perfilEtario + '<br>Série/Etapa: ' + aluno.serie + '<br>Produção Registrada: ' + aluno.tarefas + '</p></div>' +
+                            '<div class="ficha-item"><h4>Diagnóstico Pedagógico e Uso da Plataforma</h4><p>' + aluno.relatorio + '</p></div>' +
+                            '<div class="ficha-item" style="border-left-color: var(--cor-sucesso);"><h4>Atividades Registradas</h4><ul style="padding-left:20px;margin-top:6px;">' + listaHtml + '</ul></div>' +
+                            '<div class="ficha-item" style="border-left-color: var(--cor-roxo);"><h4>Orientação ao Professor</h4><p>' + aluno.orientacao + '</p></div>';
+                    }
+
+                    this.fichaTextoAtual = 'Prontuário de ' + aluno.nome + ', ' + aluno.idade + ' anos, classificado como ' + aluno.perfilEtario + ', matriculado na etapa ' + aluno.serie + '. Produção: ' + aluno.tarefas + '. Diagnóstico: ' + aluno.relatorio + '.';
+                    if (modalFicha) modalFicha.classList.add('visivel');
+                },
+
+                ouvirFichaAtual: function () {
+                    if (this.fichaTextoAtual) Voz.falar(this.fichaTextoAtual);
+                },
+
+                fecharFicha: function () {
+                    Voz.parar();
+                    var modalFicha = document.getElementById('modal-ficha-aluno');
+                    if (modalFicha) modalFicha.classList.remove('visivel');
+                },
+
+                montarFolhaHtmlAluno: function (aluno, dataEmissao) {
+                    var itensHist = aluno.historico.map(function (h) { return '<li>' + h + '</li>'; }).join('');
+                    return (
+                        '<section class="folha-relatorio-aluno">' +
+                        '<div class="cabecalho-folha-impressao">' +
+                        '<h2 style="font-size:1.35rem; margin-bottom:4px;">COLÉGIO ESTADUAL PROFESSORA IVONE SOARES CASTANHARO</h2>' +
+                        '<p style="font-size:0.9rem; font-weight:bold;">PHONETICFACE — FERRAMENTA TECNOLÓGICA DE APOIO DOCENTE NO PROCESSO DE ALFABETIZAÇÃO</p>' +
+                        '<p style="font-size:0.8rem;">PRONTUÁRIO INDIVIDUAL DE ACOMPANHAMENTO (EJA) — EMISSÃO: ' + dataEmissao + '</p>' +
+                        '</div>' +
+                        '<div class="grade-dados-impressao">' +
+                        '<div><strong>ESTUDANTE:</strong> ' + aluno.nome + '</div>' +
+                        '<div><strong>CLASSIFICAÇÃO ETÁRIA:</strong> ' + aluno.idade + ' anos (' + aluno.perfilEtario + ')</div>' +
+                        '<div><strong>SÉRIE / ETAPA:</strong> ' + aluno.serie + '</div>' +
+                        '<div><strong>PRODUÇÃO DO DIA:</strong> ' + aluno.tarefas + ' (' + aluno.pct + '% de evolução)</div>' +
+                        '</div>' +
+                        '<div class="secao-folha-impressao">' +
+                        '<h3 style="font-size:0.95rem; margin-bottom:6px;">1. DIAGNÓSTICO PEDAGÓGICO E DIGITAL</h3>' +
+                        '<p>' + aluno.relatorio + '</p>' +
+                        '</div>' +
+                        '<div class="secao-folha-impressao">' +
+                        '<h3 style="font-size:0.95rem; margin-bottom:6px;">2. REGISTRO DE ATIVIDADES REALIZADAS</h3>' +
+                        '<ul style="padding-left:18px;">' + itensHist + '</ul>' +
+                        '</div>' +
+                        '<div class="secao-folha-impressao">' +
+                        '<h3 style="font-size:0.95rem; margin-bottom:6px;">3. ENCAMINHAMENTO PEDAGÓGICO DOCENTE</h3>' +
+                        '<p>' + (aluno.orientacao || 'Acompanhar evolução nas próximas unidades') + '</p>' +
+                        '</div>' +
+                        '<div class="assinaturas-impressao">' +
+                        '<div class="linha-assinatura">Professor(a) Responsável / Turma EJA</div>' +
+                        '<div class="linha-assinatura">Coordenação Pedagógica / Direção</div>' +
+                        '</div>' +
+                        '</section>'
+                    );
+                },
+
+                executarImpressaoFolhas: function (listaParaImprimir) {
+                    var area = document.getElementById('area-impressao-relatorios');
+                    if (!area || listaParaImprimir.length === 0) return;
+                    var hoje = new Date().toLocaleDateString('pt-BR');
+                    var self = this;
+                    area.innerHTML = listaParaImprimir.map(function (aluno) {
+                        return self.montarFolhaHtmlAluno(aluno, hoje);
+                    }).join('');
+                    window.print();
+                },
+
+                imprimirAlunoUnico: function (indice) {
+                    var aluno = this.obterAlunosCombinados()[indice];
+                    if (!aluno) return;
+                    this.executarImpressaoFolhas([aluno]);
+                },
+
+                imprimirSelecionados: function () {
+                    var todos = this.obterAlunosCombinados();
+                    var self = this;
+                    var selecionados = todos.filter(function (_, idx) {
+                        return !!self.selecionadosImpressao[idx];
+                    });
+                    if (selecionados.length === 0) {
+                        alert('Selecione pelo menos um estudante na tabela marcando a caixa à esquerda para imprimir.');
+                        return;
+                    }
+                    this.executarImpressaoFolhas(selecionados);
+                },
+
+                imprimirTodosIndividual: function () {
+                    var todos = this.obterAlunosCombinados();
+                    this.executarImpressaoFolhas(todos);
+                },
+
+                exportarExcelCSV: function () {
+                    var todos = this.obterAlunosCombinados();
+                    var csv = 'Nome;Idade;Perfil Etario;Serie;Tarefas Hoje;Evolucao (%)\n';
+                    todos.forEach(function (a) {
+                        csv += '"' + a.nome + '";' + a.idade + ';"' + a.perfilEtario + '";"' + a.serie + '";"' + a.tarefas + '";' + a.pct + '\n';
+                    });
+                    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    var url = URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'relatorio_turma_eja_phoneticface.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    Voz.falar('Planilha exportada com sucesso.');
+                }
+            };
+
+            var ConstrutorInterface = {
+                renderizarAlfabeto: function () {
+                    var container = document.getElementById('container-grid-alfabeto');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    BancoDados.alfabeto.forEach(function (item) {
+                        var btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'btn-letra';
+                        btn.innerHTML = '<span>' + item.letra + '</span><span class="sub-fonema">' + item.palavra + '</span>';
+                        btn.onclick = function () { InterfaceModal.mostrarVideo(item); };
+                        container.appendChild(btn);
+                    });
+                },
+
+                renderizarVogaisConsoantes: function () {
+                    var v = document.getElementById('box-vogais');
+                    var c = document.getElementById('box-consoantes');
+                    if (!v || !c) return;
+                    v.innerHTML = '';
+                    c.innerHTML = '';
+                    BancoDados.vogais.forEach(function (l) {
+                        var b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'btn-grande';
+                        b.style.backgroundColor = 'var(--cor-destaque)';
+                        b.innerText = l;
+                        b.onclick = function () { Voz.falarVogal(l); };
+                        v.appendChild(b);
+                    });
+                    BancoDados.consoantes.forEach(function (l) {
+                        var b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'btn-letra';
+                        b.style.width = '80px';
+                        b.innerText = l;
+                        b.onclick = function () { Voz.falarConsoante(l); };
+                        c.appendChild(b);
+                    });
+                },
+
+                renderizarFamilias: function () {
+                    var bts = document.getElementById('botoes-familias');
+                    var res = document.getElementById('resultado-familia');
+                    var titulo = document.getElementById('titulo-familia-atual');
+                    if (!bts || !res || !titulo) return;
+
+                    bts.innerHTML = '';
+                    var mostrarUniao = function (consoante, falarAutomatico) {
+                        titulo.innerText = 'UNIÕES COM A LETRA ' + consoante + ':';
+                        res.innerHTML = '';
+                        var sonsDaFamilia = [];
+                        BancoDados.vogais.forEach(function (vogal) {
+                            var silaba = consoante + vogal;
+                            var somFonetico = MapaFoneticoSilabas[silaba] || silaba.toLowerCase();
+                            sonsDaFamilia.push(somFonetico);
+
+                            var btnF = document.createElement('button');
+                            btnF.type = 'button';
+                            btnF.className = 'btn-grande';
+                            btnF.style.backgroundColor = 'var(--cor-sucesso)';
+                            btnF.innerText = silaba;
+                            btnF.onclick = function () { Voz.falarSilaba(silaba); };
+                            res.appendChild(btnF);
+                        });
+                        if (falarAutomatico) {
+                            Voz.falar(sonsDaFamilia.join(', '));
+                        }
+                    };
+                    BancoDados.consoantes.forEach(function (consoante) {
+                        var b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'btn-letra';
+                        b.style.width = '65px';
+                        b.innerText = consoante;
+                        b.onclick = function () { mostrarUniao(consoante, true); };
+                        bts.appendChild(b);
+                    });
+                    mostrarUniao('B', false);
+                },
+
+                renderizarSilabas: function () {
+                    var container = document.getElementById('container-silabas');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    BancoDados.silabas.forEach(function (item) {
+                        var silaba = item.consoante + item.vogal;
+                        var somSil = MapaFoneticoSilabas[silaba] || silaba.toLowerCase();
+                        var cartao = document.createElement('div');
+                        cartao.className = 'cartao linha-silaba';
+                        cartao.innerHTML =
+                            '<div class="bloco">' + item.consoante + '</div>' +
+                            '<div style="color:var(--cor-primaria);font-size:2rem;">➕</div>' +
+                            '<div class="bloco">' + item.vogal + '</div>' +
+                            '<div style="color:var(--cor-primaria);font-size:2rem;">🟰</div>' +
+                            '<button type="button" class="bloco bloco-resultado" onclick="Voz.falar(\'' + somSil + ', de ' + item.palavra.toLowerCase() + '\')">' +
+                            '<span>' + silaba + ' DE ' + item.palavra + '</span></button>';
+                        container.appendChild(cartao);
+                    });
+                },
+
+                renderizarBotoesDesenho: function () {
+                    var container = document.getElementById('botoes-desenho');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    BancoDados.sinaisDesenho.forEach(function (sinal) {
+                        var btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'btn-ferramenta';
+                        btn.innerText = sinal;
+                        btn.onclick = function (e) { if (QuadroInterativo) QuadroInterativo.definirGuia(sinal, e.currentTarget); };
+                        container.appendChild(btn);
+                    });
+                    var btnApagar = document.createElement('button');
+                    btnApagar.type = 'button';
+                    btnApagar.className = 'btn-ferramenta';
+                    btnApagar.style.backgroundColor = 'var(--cor-destaque)';
+                    btnApagar.innerText = 'APAGAR';
+                    btnApagar.onclick = function () { if (QuadroInterativo) QuadroInterativo.limpar(); };
+                    container.appendChild(btnApagar);
+                },
+
+                renderizarCores: function () {
+                    var ct = document.getElementById('container-cores');
+                    if (!ct) return;
+                    ct.innerHTML = '';
+                    BancoDados.cores.forEach(function (c) {
+                        var btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'btn-letra';
+                        btn.innerText = c.n;
+                        btn.style.backgroundColor = c.c;
+                        btn.style.color = c.txt;
+                        btn.style.fontSize = '1.4rem';
+                        btn.style.border = '2px solid rgba(0,0,0,0.12)';
+                        btn.onclick = function () { Voz.falar(c.n.toLowerCase()); };
+                        ct.appendChild(btn);
+                    });
+                },
+
+                renderizarVidaPratica: function () {
+                    var container = document.getElementById('container-dia-a-dia');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    
+                    var filtro = LeituraPraticaApp.filtroAtual || 'todos';
+                    var filtrados = BancoDados.vidaPratica.filter(function(item) {
+                        if (filtro === 'trabalho') return item.cat === 'trabalho';
+                        if (filtro === 'geral') return item.cat !== 'trabalho';
+                        return true;
+                    });
+
+                    filtrados.forEach(function (item) {
+                        var card = document.createElement('div');
+                        card.className = 'card-interativo';
+                        card.onclick = function () { Voz.falar(item.textoFala); };
+                        card.innerHTML =
+                            '<span class="selo-categoria-card">' + item.cat + '</span>' +
+                            '<span class="icone-card">' + item.icone + '</span>' +
+                            '<h2 style="font-size:1.7rem; color:var(--cor-primaria); margin-bottom:8px;">' + item.titulo + '</h2>' +
+                            '<p style="font-size:0.9rem; color:var(--cor-texto-secundario); font-weight:600;">' + item.textoFala + '</p>';
+                        container.appendChild(card);
+                    });
+                },
+
+                renderizarAnimais: function () {
+                    var container = document.getElementById('container-animais');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    BancoDados.animais.forEach(function (animal) {
+                        var card = document.createElement('div');
+                        card.className = 'card-interativo';
+                        card.onclick = function () { Voz.falar(animal.nome.toLowerCase()); };
+                        card.innerHTML =
+                            '<span class="selo-categoria-card">' + animal.cat + '</span>' +
+                            '<h2 style="font-size:1.9rem; color:var(--cor-primaria);">' + animal.nome + '</h2>' +
+                            '<p style="font-size:0.8rem; color:var(--cor-texto-secundario); margin-top:6px; font-weight:700;">TOQUE PARA OUVIR</p>';
+                        container.appendChild(card);
+                    });
+                },
+
+                renderizarNumeros: function () {
+                    var container = document.getElementById('container-numeros');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    for (var i = 1; i <= 100; i++) {
+                        var btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'btn-letra';
+                        btn.style.height = '80px'; 
+                        btn.style.fontSize = '2.2rem';
+                        btn.innerText = i;
+                        btn.onclick = (function(num) {
+                            return function() { Voz.falar(String(num)); };
+                        })(i);
+                        container.appendChild(btn);
+                    }
+                },
+
+                configurarNavegacaoAbas: function () {
+                    var botoes = document.querySelectorAll('.btn-tab');
+                    var conteudos = document.querySelectorAll('.aba-conteudo');
+                    var menu = document.getElementById('menu-principal');
+
+                    botoes.forEach(function (btn) {
+                        btn.addEventListener('click', function (e) {
+                            Voz.parar();
+                            botoes.forEach(function (b) {
+                                b.classList.remove('active');
+                                b.setAttribute('aria-selected', 'false');
+                            });
+                            e.currentTarget.classList.add('active');
+                            e.currentTarget.setAttribute('aria-selected', 'true');
+
+                            var alvo = e.currentTarget.getAttribute('data-target');
+                            conteudos.forEach(function (c) {
+                                c.classList.remove('active');
+                                if (c.id === alvo) {
+                                    c.classList.add('active');
+                                    if (alvo === 'aba-escrever' && QuadroInterativo) {
+                                        setTimeout(function () { QuadroInterativo.redimensionar(); }, 50);
+                                    }
+                                }
+                            });
+                            if (window.innerWidth <= 768 && menu) {
+                                menu.classList.remove('aberto');
+                            }
+                        });
+                    });
+                }
+            };
+
+            function configurarFechamentoModal() {
+                var overlayVideo = document.getElementById('modal-letras');
+                if (!overlayVideo) return;
+                overlayVideo.addEventListener('click', function (e) {
+                    if (e.target === overlayVideo) InterfaceModal.fechar();
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') InterfaceModal.fechar();
+                });
+            }
+
+            function inicializarTudo() {
+                ConstrutorInterface.renderizarAlfabeto();
+                ConstrutorInterface.renderizarVogaisConsoantes();
+                ConstrutorInterface.renderizarFamilias();
+                ConstrutorInterface.renderizarSilabas();
+                ConstrutorInterface.renderizarCores();
+                ConstrutorInterface.renderizarVidaPratica();
+                ConstrutorInterface.renderizarAnimais();
+                ConstrutorInterface.renderizarNumeros();
+                ConstrutorInterface.configurarNavegacaoAbas();
+
+                BancoDados.iniciais.sort(function () { return Math.random() - 0.5; });
+                BancoDados.palavrasJogo.sort(function () { return Math.random() - 0.5; });
+
+                InteracaoApp.carregarInicial();
+                InteracaoApp.carregarPalavra();
+                InteracaoApp.carregarNomeSalvo();
+                ConstrutorSilabas.inicializar();
+
+                QuadroInterativo = new CanvasCaligrafia('canvas-caligrafia', 'container-canvas', 'guia-fundo');
+                ConstrutorInterface.renderizarBotoesDesenho();
+                QuadroInterativo.redimensionar();
+
+                configurarFechamentoModal();
+                GerenciadorPerfil.renderizarTabela('todos');
+                GerenciadorCookies.verificar();
+            }
+
+            window.toggleMenuMobile = toggleMenuMobile;
+            window.Voz = Voz;
+            window.AppConfig = AppConfig;
+            window.InterfaceModal = InterfaceModal;
+            window.InteracaoApp = InteracaoApp;
+            window.GerenciadorPerfil = GerenciadorPerfil;
+            window.ConstrutorSilabas = ConstrutorSilabas;
+            window.GerenciadorCookies = GerenciadorCookies;
+            window.LeituraPraticaApp = LeituraPraticaApp;
+            window.ReconhecimentoVoz = ReconhecimentoVoz;
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', inicializarTudo);
+            } else {
+                inicializarTudo();
+            }
+        })();
+    </script>
+</body>
+</html>
